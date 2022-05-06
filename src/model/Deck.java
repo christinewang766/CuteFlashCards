@@ -1,5 +1,6 @@
 package model;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import static model.Card.NUM_ATTEMPTS;
@@ -49,9 +50,9 @@ public class Deck {
     // up or down depending on correctness of answer and if user
     // should repeat the card again
     public String submitAnswer(String answer) {
-        if (checkAnswer(answer)) {
+        if (checkAnswer(answer) ) {
             int attempts = this.currentCard.getAttempts();
-            if (attempts <= 1 || this.currentCard.getFirstGuess()) {
+            if (attempts == 1 || this.currentCard.getFirstGuess()) {
                 this.currentCard.setCorrect(true);
                 this.completedFlashCards.add(this.currentCard);
             }
@@ -68,6 +69,11 @@ public class Deck {
         }
     }
 
+//    public void shuffle() {
+//        Collections.shuffle(this.flashCards);
+//    }
+
+
     // effects: totals up the number of cards the user correctly
     // guessed on the FIRST try
     public int countCorrect() {
@@ -83,10 +89,13 @@ public class Deck {
 
     // effects: summary of user's accuracy
     public String summary() {
-        double percentageCorrect = this.countCorrect() / this.completedFlashCards.size();
-        return "You answered " + countCorrect() + "/" + this.completedFlashCards.size()
-                + "flashcards correctly on the first try.\n"
-                + "Your score is " + percentageCorrect + "%.";
+        DecimalFormat oneDecimal = new DecimalFormat("#.#");
+
+        double percentageCorrect = 100 * (double) this.countCorrect() / (double) this.completedFlashCards.size();
+
+        return "You answered " + this.countCorrect() + "/" + this.completedFlashCards.size()
+                + " flashcards correctly on the first try.\n"
+                + "Your score is " + oneDecimal.format(percentageCorrect) + "%.";
     }
 
     // modifies: this

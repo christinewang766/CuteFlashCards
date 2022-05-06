@@ -66,12 +66,6 @@ public class DeckTest {
         assertEquals(2, cards.getCurrentCard().getAttempts());
         assertFalse(cards.getCurrentCard().getFirstGuess());
 
-        assertEquals("Correct!", cards.submitAnswer("b"));
-        assertEquals(1, cards.getCurrentCard().getAttempts());
-        assertEquals("Correct!", cards.submitAnswer("b"));
-        assertEquals(0, cards.getCurrentCard().getAttempts());
-        assertFalse(cards.getCurrentCard().getFirstGuess());
-
         cards.getNextCard();
         assertTrue(cards.getCurrentCard().getFirstGuess());
         assertEquals("Correct!", cards.submitAnswer("d"));
@@ -90,5 +84,9 @@ public class DeckTest {
 
         // only 2/3 cards were guessed right on the first run through
         assertEquals(2, cards.countCorrect());
+
+        String message = "You answered 2/3 flashcards correctly on the first try.\n"
+                + "Your score is 66.7%.";
+        assertEquals(message, cards.summary());
     }
 }
