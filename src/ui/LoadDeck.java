@@ -2,7 +2,7 @@ package ui;
 
 import javax.swing.*;
 
-import static ui.TitlePage.LIGHT_PINK;
+import static ui.MainGUI.LIGHT_PINK;
 
 public class LoadDeck {
 

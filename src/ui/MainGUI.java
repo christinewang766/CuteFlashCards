@@ -1,6 +1,7 @@
 package ui;
 
-import model.Card;
+import persistance.JsonReader;
+import persistance.JsonWriter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class TitlePage extends JPanel {
+public class MainGUI extends JPanel {
 
     public final static int WIDTH = 1500;
     public final static int HEIGHT = 1000;
@@ -28,8 +29,13 @@ public class TitlePage extends JPanel {
     private JButton loadDeck;
     private TitlePageActionListener listen;
     private CreateCards create;
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
+    private static final String JSON_STORE = "./data/BookOfCats.json";
 
-    public TitlePage() {
+    public MainGUI() {
+        jsonWriter = new JsonWriter(JSON_STORE);
+        jsonReader = new JsonReader(JSON_STORE);
         makeFrame();
         layers();
         frame.pack();
@@ -73,33 +79,46 @@ public class TitlePage extends JPanel {
         cards.add(titleOptionsPanel, "create warning");
 
         create = new CreateCards();
-        create.displayCreateDeck();
-//        frame.getContentPane().add(create.mainPanel);
-        cards.add(create.mainPanel, "create deck");
+        createActions();
+        cards.add(create.createDeckPanel, "create deck");
 
         load = new LoadDeck();
-        load.displayLoadDeck();
-//        frame.getContentPane().add(load.loadDeckPanel);
+        loadActions();
         cards.add(load.loadDeckPanel, "load deck");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
     }
 
+    // effects: the methods and buttons that must be called
+    // from the CreateCards class before main GUI can run it
+    private void createActions() {
+        create.displayCreateDeck();
+        JButton menu = create.getMenuButton();
+        menu.setActionCommand("create warning");
+        menu.addActionListener(listen);
+        JButton addCard = create.getAddCardButton();
+        addCard.setActionCommand("add card");
+        addCard.addActionListener(listen);
+    }
+
+    // effects: the methods and buttons that must be called
+    // from the LoadDeck class before main GUI can run it
+    private void loadActions() {
+        load.displayLoadDeck();
+    }
 
     // effects: shows the Create Deck and Load Deck option
     private void displayTitleOptions() {
         titleOptionsPanel = new JPanel();
         titleOptionsPanel.setBackground(LIGHT_PINK);
         titleOptionsPanel.setLayout(new BoxLayout(titleOptionsPanel, BoxLayout.Y_AXIS));
-//        frame.getContentPane().add(titleOptionsPanel);
         Icon icon = new ImageIcon("src/images/titleGif.gif");
         JLabel title = new JLabel(icon);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleOptionsPanel.add(title);
         titleButtons(titleOptionsPanel);
     }
-
 
     //effects: displays the menu buttons
     public void titleButtons(JPanel panel) {
@@ -166,6 +185,7 @@ public class TitlePage extends JPanel {
                 JOptionPane.showMessageDialog(load.loadDeckPanel, "Your cards are loading in!",
                         "Patience, patience!", JOptionPane.INFORMATION_MESSAGE);
             } else if (cmd.equals("create warning")) {
+                create.warnUser();
                 cl.first(cards);
             }
         }

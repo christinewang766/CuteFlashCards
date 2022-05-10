@@ -3,8 +3,6 @@ package ui;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.font.TextAttribute;
@@ -12,13 +10,13 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.Map;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
-import static ui.TitlePage.*;
+import static ui.MainGUI.*;
 
-public class CreateCards extends TitlePage implements FocusListener {
+public class CreateCards implements FocusListener {
 
     public final static Font CALIBRI_ITALIC = new Font("Calibri", Font.ITALIC, 40);
     public final static Font CALIBRI_BOLD = new Font("Calibri", Font.BOLD, 30);
-    protected JPanel mainPanel;
+    protected JPanel createDeckPanel;
     private JPanel scrollArea;
     private JPanel header;
     private JTextArea title;
@@ -32,8 +30,8 @@ public class CreateCards extends TitlePage implements FocusListener {
 
     // effects: shows the flashcards being made
     protected void displayCreateDeck() {
-        mainPanel = new JPanel(new FlowLayout((int) Component.CENTER_ALIGNMENT, 40, 40));
-        mainPanel.setBackground(LIGHT_PINK);
+        createDeckPanel = new JPanel(new FlowLayout((int) Component.CENTER_ALIGNMENT, 40, 40));
+        createDeckPanel.setBackground(LIGHT_PINK);
         setUpHeader();
         setUpScrollPane();
     }
@@ -47,7 +45,7 @@ public class CreateCards extends TitlePage implements FocusListener {
         createCard(header);
         header.setBackground(LIGHT_PINK);
 
-        mainPanel.add(header, BorderLayout.NORTH);
+        createDeckPanel.add(header, BorderLayout.NORTH);
     }
 
     // effects: creates the vertical scroll pane to look at created cards
@@ -79,7 +77,7 @@ public class CreateCards extends TitlePage implements FocusListener {
 
         scrollPane.setViewport(viewport);
         scrollPane.setViewportView(scrollArea);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        createDeckPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     // effects: displays an editable title for the new deck
@@ -115,8 +113,6 @@ public class CreateCards extends TitlePage implements FocusListener {
         imageIcon = new ImageIcon(newImg);
 
         menuButton = new JButton("Menu", imageIcon);
-        menuButton.setActionCommand("create warning");
-        menuButton.addActionListener(...);
         menuButton.setFont(CALIBRI_BOLD);
         buttonHelper(menuButton);
         menuButton.setBorder(BorderFactory.createCompoundBorder(
@@ -134,11 +130,14 @@ public class CreateCards extends TitlePage implements FocusListener {
         imageIcon = new ImageIcon(newImg);
 
         addCardButton = new JButton("Add Card", imageIcon);
-        menuButton.setActionCommand("add card");
-        menuButton.addActionListener(...);
         addCardButton.setFont(CALIBRI_BOLD);
         buttonHelper(addCardButton);
         panel.add(addCardButton);
+    }
+
+    // effects: a pop up message asking if user would like to save their cards
+    // before exiting to the menu
+    void warnUser() {
     }
 
     @Override
@@ -152,6 +151,15 @@ public class CreateCards extends TitlePage implements FocusListener {
         JTextArea titleTextArea = (JTextArea) e.getSource();
         userTitle = titleTextArea.getText();
         System.out.println(userTitle);
+    }
+
+    // getters
+    public JButton getMenuButton() {
+        return menuButton;
+    }
+
+    public JButton getAddCardButton() {
+        return addCardButton;
     }
 
 

@@ -6,17 +6,28 @@ base for flashcards
 public class Card {
     private String question;
     private String answer;
-    private Boolean correct;
     private Boolean firstGuess;
+    private Boolean complete;
+    private Boolean starred;
     private int attempts;
 
     public static final int NUM_ATTEMPTS = 2;
 
-    public Card(String question, String answer) {
-        this.attempts = NUM_ATTEMPTS;
+    public Card(String question, String answer, Boolean complete, Boolean starred, int attempts, Boolean firstGuess) {
+        this.attempts = attempts;
         this.question = question;
         this.answer = answer;
-        this.correct = false;
+        this.starred = starred;
+        this.complete = complete;
+        this.firstGuess = firstGuess;
+        init();
+    }
+
+    // effects: initiate new card values
+    private void init() {
+        this.attempts = NUM_ATTEMPTS;
+        this.starred = false;
+        this.complete = false;
         this.firstGuess = true;
     }
 
@@ -29,17 +40,13 @@ public class Card {
         this.answer = answer;
     }
 
-    public void setCorrect(Boolean setting) {
-        this.correct = setting;
-    }
+    public  void setComplete(Boolean complete) { this.complete = complete; }
 
-    public void setFirstGuessFalse() {
-        this.firstGuess = false;
-    }
+    public void setFirstGuess(Boolean firstGuess) { this.firstGuess = firstGuess; }
 
-    public void setAttempts(int setting) {
-        this.attempts = setting;
-    }
+    public void setStarred(Boolean starred) { this.starred = starred; }
+
+    public void setAttempts(int setting) { this.attempts = setting; }
 
     // getters
     public String getQuestion() {
@@ -50,16 +57,15 @@ public class Card {
         return this.answer;
     }
 
-    public Boolean getFirstGuess() {
-        return this.firstGuess;
+    public Boolean getComplete() { return this.complete; }
+
+    public Boolean getFirstGuess() { return this.firstGuess; }
+
+    public Boolean getStarred() {
+        return this.starred;
     }
 
-    public Boolean getCorrect() {
-        return this.correct;
-    }
+    public int getAttempts() { return this.attempts; }
 
-    public int getAttempts() {
-        return this.attempts;
-    }
 
 }

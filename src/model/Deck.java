@@ -2,6 +2,8 @@ package model;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static model.Card.NUM_ATTEMPTS;
 
@@ -12,8 +14,10 @@ public class Deck {
     private ArrayList<Card> starredFlashCards;
     private int nextCard;
     private Card currentCard;
+    private String title;
 
-    public Deck() {
+    public Deck(String title) {
+        this.title = title;
         this.flashCards = new ArrayList<>();
         this.completedFlashCards = new ArrayList<>();
         this.starredFlashCards = new ArrayList<>();
@@ -39,7 +43,7 @@ public class Deck {
     // effects: checks the answer to the current card
     public boolean checkAnswer(String answer) {
         if (this.currentCard.getAnswer().equalsIgnoreCase(answer)
-                && !this.currentCard.getCorrect()) {
+                && !this.currentCard.getComplete()) {
             return true;
         }
         return false;
@@ -53,25 +57,30 @@ public class Deck {
         if (checkAnswer(answer) ) {
             int attempts = this.currentCard.getAttempts();
             if (attempts == 1 || this.currentCard.getFirstGuess()) {
-                this.currentCard.setCorrect(true);
+                this.currentCard.setComplete(true);
                 this.completedFlashCards.add(this.currentCard);
             }
             this.currentCard.setAttempts(attempts - 1);
             return ("Correct!");
         } else {
-            this.currentCard.setFirstGuessFalse();
-            this.currentCard.setAttempts(NUM_ATTEMPTS);
             // adds card to the back of the list
-            Card wrongCard = new Card(this.currentCard.getQuestion(), this.currentCard.getAnswer());
-            wrongCard.setFirstGuessFalse();
-            this.flashCards.add(wrongCard);
+            this.currentCard.setFirstGuess(false);
+            Card wrongCard = new Card(this.currentCard.getQuestion(), this.currentCard.getAnswer(), false,
+                    this.currentCard.getStarred(), NUM_ATTEMPTS, this.currentCard.getFirstGuess());
+            wrongCard.setFirstGuess(false);
+            addFlashCard(wrongCard);
             return ("Wrong!");
         }
     }
 
-//    public void shuffle() {
-//        Collections.shuffle(this.flashCards);
-//    }
+    private void getUnfinishedFlashcards() {
+
+    }
+
+    // effects: shuffles the deck
+    public void shuffle() {
+        Collections.shuffle(this.flashCards);
+    }
 
 
     // effects: totals up the number of cards the user correctly
@@ -101,9 +110,15 @@ public class Deck {
     // modifies: this
     // effects: fresh batch of cards with no history
     public void resetCards() {
+        deleteAllPrevious();
         for (Card card : this.completedFlashCards) {
-            this.flashCards.add(card);
+            addFlashCard(card);
             this.completedFlashCards.remove(card);
+        }
+        for (Card card : this.flashCards) {
+            card.setComplete(false);
+            card.setAttempts(NUM_ATTEMPTS);
+            card.setFirstGuess(true);
         }
     }
 
@@ -115,6 +130,39 @@ public class Deck {
                 starredFlashCards.add(card);
             }
         }
+    }
+
+    // requires: card object should not be null
+    // modifies: this
+    // effects: adds a card object to a List of Card
+    public void addFlashCard(Card card) {
+        this.flashCards.add(card);
+    }
+
+    // requires: card object should not be null
+    // modifies: this
+    // effects: adds a card object to a List of Card
+    public void addCompleteCard(Card card) {
+        this.completedFlashCards.add(card);
+    }
+
+    // effects: iterates through flashcards to delete all cards
+    // that have already been attempted
+    private void deleteAllPrevious() {
+        int indexBookMark = flashCards.indexOf(this.currentCard);
+        for(int i = 0; i < indexBookMark; i++) {
+            flashCards.remove(0);
+        }
+    }
+
+    // effects: returns an unmodifiable list of flashcards in this deck
+    public List<Card> getUnmodFlashCards() {
+        return Collections.unmodifiableList(this.flashCards);
+    }
+
+    // effects: returns an unmodifiable list of completed cards in this deck
+    public List<Card> getUnmodCompletedCards() {
+        return Collections.unmodifiableList(this.completedFlashCards);
     }
 
     // getters
@@ -129,4 +177,5 @@ public class Deck {
     public Card getCurrentCard() {
         return this.currentCard;
     }
+
 }
