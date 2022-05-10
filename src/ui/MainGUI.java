@@ -8,17 +8,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import static ui.AddCardTemplate.makeJOptionButtons;
+import static ui.CreateCards.ENTER_TITLE;
 
 public class MainGUI extends JPanel {
 
     public final static int WIDTH = 1500;
     public final static int HEIGHT = 1000;
     public final static Font CONSOLAS = new Font("Consolas", Font.BOLD, 37);
-    public final static Color BRIGHT_PINK = new Color(253, 27,96);
-    public final static Color LIGHT_PINK = new Color(254,228,227);
+    public final static Color BRIGHT_PINK = new Color(253, 27, 96);
+    public final static Color LIGHT_PINK = new Color(254, 228, 227);
 
 
     private JFrame frame;
@@ -31,7 +35,7 @@ public class MainGUI extends JPanel {
     private CreateCards create;
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
-    private static final String JSON_STORE = "./data/BookOfCats.json";
+    private static final String JSON_STORE = "./data/CuteFlashCards.json";
 
     public MainGUI() {
         jsonWriter = new JsonWriter(JSON_STORE);
@@ -44,17 +48,13 @@ public class MainGUI extends JPanel {
         frame.setVisible(true);
     }
 
-    // effects: the entire GUI, essentially
-    private void makeFrame() {
-
+    // makes the windows title pink with icon
+    public static void prettyFrame(JFrame frame) {
         // credits: https://stackoverflow.com/questions/2482971/how-to-change-the-color-of-titlebar-in-jframe
         UIDefaults uiDefaults = UIManager.getDefaults();
         uiDefaults.put("activeCaption", new javax.swing.plaf.ColorUIResource(BRIGHT_PINK));
         uiDefaults.put("activeCaptionText", new javax.swing.plaf.ColorUIResource(Color.white));
         JFrame.setDefaultLookAndFeelDecorated(true);
-
-        frame = new JFrame("Cutsey Cards");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Image icon = null;
         try {
@@ -64,7 +64,16 @@ public class MainGUI extends JPanel {
         }
 
         frame.setIconImage(icon);
-        frame.setSize(200,200);
+        frame.setSize(200, 200);
+    }
+
+    // effects: the entire GUI, essentially
+    private void makeFrame() {
+
+        frame = new JFrame("Cutsey Cards");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        prettyFrame(frame);
 
         frame.getContentPane().setLayout(new CardLayout());
     }
@@ -75,16 +84,19 @@ public class MainGUI extends JPanel {
 
         //Create the panel that contains the "cards".
         cards = new JPanel(new CardLayout());
-        displayTitleOptions();
-        cards.add(titleOptionsPanel, "create warning");
-
+//        displayTitleOptions();
+//        cards.add(titleOptionsPanel, "create warning");
+//
         create = new CreateCards();
         createActions();
         cards.add(create.createDeckPanel, "create deck");
 
-        load = new LoadDeck();
-        loadActions();
-        cards.add(load.loadDeckPanel, "load deck");
+        AddCardTemplate addCard = new AddCardTemplate();
+        cards.add(addCard.addCardPanel, "add card");
+
+//        load = new LoadDeck();
+//        loadActions();
+//        cards.add(load.loadDeckPanel, "load deck");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
@@ -93,7 +105,6 @@ public class MainGUI extends JPanel {
     // effects: the methods and buttons that must be called
     // from the CreateCards class before main GUI can run it
     private void createActions() {
-        create.displayCreateDeck();
         JButton menu = create.getMenuButton();
         menu.setActionCommand("create warning");
         menu.addActionListener(listen);
@@ -105,7 +116,7 @@ public class MainGUI extends JPanel {
     // effects: the methods and buttons that must be called
     // from the LoadDeck class before main GUI can run it
     private void loadActions() {
-        load.displayLoadDeck();
+        // TO DO
     }
 
     // effects: shows the Create Deck and Load Deck option
@@ -160,17 +171,7 @@ public class MainGUI extends JPanel {
         button.setForeground(BRIGHT_PINK);
     }
 
-    // getters
-    public CardLayout getCl() {
-        return (CardLayout) cards.getLayout();
-    }
-
-    public JPanel getCards() {
-        return cards;
-    }
-
-    public TitlePageActionListener getAl() {
-        return listen;
+    private void createMenuPopUp() {
     }
 
     class TitlePageActionListener implements ActionListener {
@@ -179,14 +180,23 @@ public class MainGUI extends JPanel {
             CardLayout cl = (CardLayout) (cards.getLayout());
             String cmd = e.getActionCommand();
             if (cmd.equals("create deck")) {
-                cl.show (cards, "create deck");
+                cl.show(cards, "create deck");
+
             } else if (cmd.equals("load deck")) {
                 cl.show(cards, "load deck");
                 JOptionPane.showMessageDialog(load.loadDeckPanel, "Your cards are loading in!",
                         "Patience, patience!", JOptionPane.INFORMATION_MESSAGE);
+
             } else if (cmd.equals("create warning")) {
                 create.warnUser();
                 cl.first(cards);
+
+            } else if (cmd.equals("add card")) {
+                if (create.getUserTitle().equals(ENTER_TITLE) || create.getUserTitle().equals("")) {
+                    create.createAddCardPopUp();
+                } else {
+                    cl.show(cards, "add card");
+                }
             }
         }
     }

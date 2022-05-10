@@ -1,21 +1,26 @@
 package ui;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.awt.geom.RoundRectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
+import static ui.AddCardTemplate.makeJOptionButtons;
 import static ui.MainGUI.*;
 
-public class CreateCards implements FocusListener {
+public class CreateCards implements FocusListener, ActionListener {
 
     public final static Font CALIBRI_ITALIC = new Font("Calibri", Font.ITALIC, 40);
     public final static Font CALIBRI_BOLD = new Font("Calibri", Font.BOLD, 30);
+    public final static String ENTER_TITLE = "Type your title...";
+
     protected JPanel createDeckPanel;
     private JPanel scrollArea;
     private JPanel header;
@@ -26,6 +31,7 @@ public class CreateCards implements FocusListener {
     private JScrollPane scrollPane;
 
     public CreateCards() {
+        displayCreateDeck();
     }
 
     // effects: shows the flashcards being made
@@ -85,23 +91,28 @@ public class CreateCards implements FocusListener {
 
         Map attributes = CALIBRI_ITALIC.getAttributes();
         attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        userTitle = "";
 
-        title = new RoundJTextArea(100);
+        title = new RoundJTextArea("");
         title.addFocusListener(this);
-        title.setText("Type your title...");
+        title.setText(ENTER_TITLE);
         title.setColumns(20);
         title.setFont(CALIBRI_ITALIC.deriveFont(attributes));
 
-        title.setForeground(BRIGHT_PINK);
-        title.setBackground(new Color(255, 245, 245));
-        title.setBorder(createEmptyBorder());
-        title.setBorder(BorderFactory.createCompoundBorder(
-                title.getBorder(),
-                createEmptyBorder(15, 15, 15, 15)));
-
-        title.setLineWrap(true);
-        title.setWrapStyleWord(true);
+        textAreaHelper(title);
         return title;
+    }
+
+    // effects: text area attributes
+    public static void textAreaHelper(JTextArea text) {
+        text.setForeground(BRIGHT_PINK);
+        text.setBackground(new Color(255, 245, 245));
+        text.setBorder(createEmptyBorder());
+        text.setBorder(BorderFactory.createCompoundBorder(
+                text.getBorder(),
+                createEmptyBorder(15, 15, 15, 15)));
+        text.setLineWrap(true);
+        text.setWrapStyleWord(true);
     }
 
     // effects: brings you back to the main title page,
@@ -135,55 +146,53 @@ public class CreateCards implements FocusListener {
         panel.add(addCardButton);
     }
 
-    // effects: a pop up message asking if user would like to save their cards
-    // before exiting to the menu
-    void warnUser() {
-    }
+    protected void createAddCardPopUp() {
+        try {
+            // credit: Emekat http://pixelartmaker.com/art/ad1ae9084485dac
+            Image img = ImageIO.read(new File("src/images/knife.png"));
+            Image scaledImg = img.getScaledInstance(130, 140, java.awt.Image.SCALE_SMOOTH);
+            ImageIcon icon = new ImageIcon(scaledImg);
 
-    @Override
-    // effects: none, irrelevant! (for now...)
-    public void focusGained(FocusEvent e) {
-    }
-
-    @Override
-    // saves the title entered
-    public void focusLost(FocusEvent e) {
-        JTextArea titleTextArea = (JTextArea) e.getSource();
-        userTitle = titleTextArea.getText();
-        System.out.println(userTitle);
-    }
-
-    // getters
-    public JButton getMenuButton() {
-        return menuButton;
-    }
-
-    public JButton getAddCardButton() {
-        return addCardButton;
-    }
-
-
-    // effects: creates the beveled text box for the title of the deck
-    // credits: https://stackoverflow.com/questions/8515601/java-swing-rounded-border-for-jtextfield
-    private class RoundJTextArea extends JTextArea {
-        private Shape shape;
-
-        public RoundJTextArea(int size) {
-            super(String.valueOf(size));
-            setOpaque(false); // As suggested by @AVD in comment.
-        }
-
-        protected void paintComponent(Graphics g) {
-            g.setColor(new Color(255, 245, 245));
-            g.fillRoundRect(0, 0, getWidth() - 5, getHeight() - 5, 30, 30);
-            super.paintComponent(g);
-        }
-
-        public boolean contains(int x, int y) {
-            if (shape == null || !shape.getBounds().equals(getBounds())) {
-                shape = new RoundRectangle2D.Float(0, 0, getWidth() - 5, getHeight() - 5, 30, 30);
-            }
-            return shape.contains(x, y);
+            JOptionPane.showOptionDialog(createDeckPanel,
+                    "Please add a new title!", "Not to be mean...but...",
+                    JOptionPane.DEFAULT_OPTION,JOptionPane.INFORMATION_MESSAGE, icon, new Object[]{}, null);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+        // effects: a pop up message asking if user would like to save their cards
+        // before exiting to the menu
+        void warnUser () {
+        }
+
+        @Override
+        // effects: none, irrelevant! (for now...)
+        public void focusGained (FocusEvent e){
+        }
+
+        @Override
+        // saves the title entered
+        public void focusLost (FocusEvent e){
+            JTextArea titleTextArea = (JTextArea) e.getSource();
+            userTitle = titleTextArea.getText();
+            System.out.println(userTitle); // delete later
+        }
+
+        // getters
+        public JButton getMenuButton () {
+            return menuButton;
+        }
+
+        public JButton getAddCardButton () {
+            return addCardButton;
+        }
+
+        public String getUserTitle () {
+            return this.userTitle;
+        }
+
+        @Override
+        public void actionPerformed (ActionEvent e){
+        }
 }
