@@ -1,4 +1,4 @@
-package persistance;
+package model;
 
 import model.Card;
 import model.Deck;
@@ -62,21 +62,21 @@ public class JsonReader {
         }
     }
 
-        // modifies: deck
-        // effects: parses card from JSON object and adds it to deck
-        private void addCard(Deck deck, JSONObject jsonObject) {
-            String question = jsonObject.getString("question");
-            String answer = jsonObject.getString("answer");
-            Boolean complete = jsonObject.getBoolean("complete");
-            Boolean starred = jsonObject.getBoolean("starred");
-            int attempts = jsonObject.getInt("attempts");
-            Boolean firstGuess = jsonObject.getBoolean("firstGuess");
+    // modifies: deck
+    // effects: parses card from JSON object and adds it to deck
+    private void addCard(Deck deck, JSONObject jsonObject) {
+        String question = jsonObject.getString("question");
+        String answer = jsonObject.getString("answer");
+        Boolean complete = jsonObject.getBoolean("complete");
+        Boolean starred = jsonObject.getBoolean("starred");
+        int attempts = jsonObject.getInt("attempts");
+        Boolean firstGuess = jsonObject.getBoolean("firstGuess");
 
-            Card card = new Card(question, answer, complete, starred, attempts, firstGuess);
-            if(complete) {
-                deck.addCompleteCard(card);
-            } else {
-                deck.addFlashCard(card);
-            }
+        Card card = new Card(question, answer, complete, starred, attempts, firstGuess);
+        if(complete) {
+            deck.addCompleteCard(card);
+        } else {
+            deck.addFlashCard(card);
         }
     }
+}

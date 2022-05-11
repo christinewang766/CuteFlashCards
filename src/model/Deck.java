@@ -1,5 +1,8 @@
 package model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +10,7 @@ import java.util.List;
 
 import static model.Card.NUM_ATTEMPTS;
 
-public class Deck {
+public class Deck implements Writable {
 
     private ArrayList<Card> flashCards;
     private ArrayList<Card> completedFlashCards;
@@ -73,8 +76,10 @@ public class Deck {
         }
     }
 
-    private void getUnfinishedFlashcards() {
-
+    // effects: deletes the cards marks complete from flashcards
+    private ArrayList<Card> getUnfinishedFlashcards() {
+        deleteAllPrevious();
+        return this.flashCards;
     }
 
     // effects: shuffles the deck
@@ -155,6 +160,34 @@ public class Deck {
         }
     }
 
+    @Override
+    // inspired by JsonSerializationDemo
+    // effects: converts book to Json
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("title", title);
+        json.put("deck", deckToJson());
+        return json;
+    }
+
+    // inspired by JsonSerializationDemo
+    // effects: returns things in this book as a JSON array
+    private JSONArray deckToJson() {
+        JSONArray jsonArray = new JSONArray();
+
+        for (Card t : getUnfinishedFlashcards()) {
+            jsonArray.put(t.toJson());
+        }
+
+        for (Card t : completedFlashCards) {
+            jsonArray.put(t.toJson());
+        }
+
+        return jsonArray;
+    }
+
+    // getters
+
     // effects: returns an unmodifiable list of flashcards in this deck
     public List<Card> getUnmodFlashCards() {
         return Collections.unmodifiableList(this.flashCards);
@@ -165,7 +198,6 @@ public class Deck {
         return Collections.unmodifiableList(this.completedFlashCards);
     }
 
-    // getters
     public ArrayList<Card> getFlashCards() {
         return this.flashCards;
     }
@@ -176,6 +208,12 @@ public class Deck {
 
     public Card getCurrentCard() {
         return this.currentCard;
+    }
+
+    // getters & setters
+    public String getTitle() { return this.title; }
+    public void setTitle(String title) {
+        this.title = title;
     }
 
 }

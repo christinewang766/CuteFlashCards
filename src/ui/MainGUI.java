@@ -1,20 +1,20 @@
 package ui;
 
-import persistance.JsonReader;
-import persistance.JsonWriter;
+import model.Card;
+import model.JsonReader;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static ui.AddCardTemplate.makeJOptionButtons;
+import static model.Card.NUM_ATTEMPTS;
 import static ui.CreateCards.ENTER_TITLE;
+import static ui.HelperMethods.*;
 
 public class MainGUI extends JPanel {
 
@@ -33,12 +33,10 @@ public class MainGUI extends JPanel {
     private JButton loadDeck;
     private TitlePageActionListener listen;
     private CreateCards create;
-    private JsonWriter jsonWriter;
     private JsonReader jsonReader;
-    private static final String JSON_STORE = "./data/CuteFlashCards.json";
+    public static final String JSON_STORE = "./data/CuteFlashCards.json";
 
     public MainGUI() {
-        jsonWriter = new JsonWriter(JSON_STORE);
         jsonReader = new JsonReader(JSON_STORE);
         makeFrame();
         layers();
@@ -49,7 +47,7 @@ public class MainGUI extends JPanel {
     }
 
     // makes the windows title pink with icon
-    public static void prettyFrame(JFrame frame) {
+    private void prettyFrame(JFrame frame) {
         // credits: https://stackoverflow.com/questions/2482971/how-to-change-the-color-of-titlebar-in-jframe
         UIDefaults uiDefaults = UIManager.getDefaults();
         uiDefaults.put("activeCaption", new javax.swing.plaf.ColorUIResource(BRIGHT_PINK));
@@ -69,12 +67,9 @@ public class MainGUI extends JPanel {
 
     // effects: the entire GUI, essentially
     private void makeFrame() {
-
         frame = new JFrame("Cutsey Cards");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         prettyFrame(frame);
-
         frame.getContentPane().setLayout(new CardLayout());
     }
 
@@ -90,9 +85,6 @@ public class MainGUI extends JPanel {
         create = new CreateCards();
         createActions();
         cards.add(create.createDeckPanel, "create deck");
-
-        AddCardTemplate addCard = new AddCardTemplate();
-        cards.add(addCard.addCardPanel, "add card");
 
 //        load = new LoadDeck();
 //        loadActions();
@@ -111,6 +103,19 @@ public class MainGUI extends JPanel {
         JButton addCard = create.getAddCardButton();
         addCard.setActionCommand("add card");
         addCard.addActionListener(listen);
+
+        JButton save = create.getSaveButton();
+        save.setActionCommand("save");
+        save.addActionListener(listen);
+        JButton confirm = create.getConfirmButton();
+        confirm.setActionCommand("confirm");
+        confirm.addActionListener(listen);
+        JButton cancel = create.getCancelButton();
+        cancel.setActionCommand("cancel");
+        cancel.addActionListener(listen);
+        JButton clear = create.getClearButton();
+        clear.setActionCommand("clear");
+        clear.addActionListener(listen);
     }
 
     // effects: the methods and buttons that must be called
@@ -160,20 +165,6 @@ public class MainGUI extends JPanel {
         loadDeck.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-
-    // modifies: this
-    // effects: sets up and aligns the title page buttons
-    public static void buttonHelper(JButton button) {
-        button.setHorizontalTextPosition(JButton.CENTER);
-        button.setVerticalTextPosition(JButton.CENTER);
-        button.setContentAreaFilled(false);
-        button.setBorderPainted(false);
-        button.setForeground(BRIGHT_PINK);
-    }
-
-    private void createMenuPopUp() {
-    }
-
     class TitlePageActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -184,18 +175,46 @@ public class MainGUI extends JPanel {
 
             } else if (cmd.equals("load deck")) {
                 cl.show(cards, "load deck");
+                // TO DO MESSAGE
                 JOptionPane.showMessageDialog(load.loadDeckPanel, "Your cards are loading in!",
                         "Patience, patience!", JOptionPane.INFORMATION_MESSAGE);
 
             } else if (cmd.equals("create warning")) {
-                create.warnUser();
+                create.menuWarnUser();
                 cl.first(cards);
+
+            } else if (cmd.equals("save")) {
+                if (create.getDeck().getFlashCards().isEmpty()) {
+                    createNoButtonJOption(create.createDeckPanel, "There's no cards to save!",
+                            "Not to be mean...but...", "src/images/save.png");
+                } else if (create.getUserTitle() == "Add a title" ||
+                        create.getUserTitle() == ENTER_TITLE) {
+                    createNoButtonJOption(create.createDeckPanel, "Please choose a new title!",
+                            "Not to be mean...but...", "src/images/knife.png");
+                }
+                create.saveDeck();
 
             } else if (cmd.equals("add card")) {
                 if (create.getUserTitle().equals(ENTER_TITLE) || create.getUserTitle().equals("")) {
-                    create.createAddCardPopUp();
+                    createNoButtonJOption(create.createDeckPanel, "Please choose a new title!",
+                            "Not to be mean...but...", "src/images/knife.png");
                 } else {
-                    cl.show(cards, "add card");
+                    create.optionPane();
+                }
+            } else if (cmd.equals("confirm")) {
+                create.finalCharCheck();
+                System.out.println(create.getQuestion() + " : " + create.getAnswer());
+            } else if (cmd.equals("cancel")) {
+                // credits: https://stackoverflow.com/questions/18105598/closing-a-joptionpane-programmatically
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof JDialog) {
+                        JDialog dialog = (JDialog) window;
+                        if (dialog.getContentPane().getComponentCount() == 1
+                                && dialog.getContentPane().getComponent(0) instanceof JOptionPane) {
+                            dialog.dispose();
+                        }
+                    }
                 }
             }
         }

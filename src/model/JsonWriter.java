@@ -1,4 +1,7 @@
-package persistance;
+package model;
+
+import model.Deck;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +24,13 @@ public class JsonWriter {
     // be opened for writing
     public void open() throws FileNotFoundException {
         writer = new PrintWriter(new File(destination));
+    }
+
+    // modifies: this
+    // effects: writes JSON representation of book to file
+    public void write(Deck wr) {
+        JSONObject json = wr.toJson();
+        saveToFile(json.toString(TAB));
     }
 
     // modifies: this

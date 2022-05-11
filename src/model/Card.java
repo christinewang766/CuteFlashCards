@@ -1,9 +1,11 @@
 package model;
 
+import org.json.JSONObject;
+
 /*
 base for flashcards
  */
-public class Card {
+public class Card implements Writable {
     private String question;
     private String answer;
     private Boolean firstGuess;
@@ -29,6 +31,20 @@ public class Card {
         this.starred = false;
         this.complete = false;
         this.firstGuess = true;
+    }
+
+    @Override
+    // inspired by JsonSerializationDemo
+    // effects: converts cat to Json
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("question", question);
+        json.put("answer", answer);
+        json.put("attempts", attempts);
+        json.put("starred", starred);
+        json.put("complete", complete);
+        json.put("firstGuess", firstGuess);
+        return json;
     }
 
     // setters
