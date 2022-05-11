@@ -25,6 +25,7 @@ public class CreateCards {
     public final static Font CALIBRI_ITALIC = new Font("Calibri", Font.ITALIC, 40);
     public final static Font CALIBRI_BOLD = new Font("Calibri", Font.BOLD, 30);
     public final static String ENTER_TITLE = "Type your title...";
+    public final static int CHAR_LIMIT = 189;
 
     protected JPanel createDeckPanel;
     private JsonWriter jsonWriter;
@@ -245,14 +246,14 @@ public class CreateCards {
     private void decoratePanel() {
         addCardPanel = new JPanel(new GridBagLayout());
 
-        questionArea = new RoundJTextArea("Type your question here...\n(140 characters max)");
+        questionArea = new RoundJTextArea("Type your question here...\n(" + CHAR_LIMIT + " characters max)");
         textAreaHelper(questionArea);
         questionArea.setColumns(20);
         questionArea.setRows(7);
         questionArea.setFont(new Font("Calibri", Font.BOLD, 25));
         questionArea.addFocusListener(fListen);
 
-        answerArea = new RoundJTextArea("Type your answer here...\n(140 characters max)");
+        answerArea = new RoundJTextArea("Type your answer here...\n(" + CHAR_LIMIT + " characters max)");
         answerArea.setColumns(20);
         answerArea.setRows(7);
         textAreaHelper(answerArea);
@@ -278,7 +279,7 @@ public class CreateCards {
     // effects: sets up the option panel
     protected void optionPane() {
         Object[] textLabels = {"Question:", questionArea, "Answer:", answerArea};
-        JButton[] buttons = {confirm, cancel};
+        JButton[] buttons = {confirm, cancel, clear};
 
         JOptionPane.showOptionDialog(createDeckPanel, textLabels, "Add Card",
                 JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, icon,
@@ -295,11 +296,11 @@ public class CreateCards {
         makeJOptionButtons(clear);
     }
 
-    // effects: checks if the answer/question text is < 140 char
+    // effects: checks if the answer/question text is < 189 char
     private void charCountCheck(FocusEvent e) {
         JTextArea textArea = (JTextArea) e.getSource();
-        if (textArea.getText().length() > 140) {
-            int charOver = textArea.getText().length() - 140;
+        if (textArea.getText().length() > CHAR_LIMIT) {
+            int charOver = textArea.getText().length() - CHAR_LIMIT;
             String message = "You are " + charOver + " characters\nover the limit!";
             createNoButtonJOption(addCardPanel, message, "Character Max Reached", "src/images/knife.png");
         } else {
@@ -314,13 +315,13 @@ public class CreateCards {
     // effects: checks if both the question and answer text areas
     // satisfy criteria and prints out appropriate message if not
     protected void finalCharCheck() {
-        int charOver = questionArea.getText().length() - 140;
-        if (questionArea.getText().length() > 140) {
+        int charOver = questionArea.getText().length() - CHAR_LIMIT;
+        if (questionArea.getText().length() > CHAR_LIMIT) {
             String message = "Your question is " + charOver + " characters\nover the limit!" +
                     "\nPlease fix your question before creating your card.";
             createNoButtonJOption(addCardPanel, message,
                     "Not to be mean...but...", "src/images/knife.png");
-        } else if (answerArea.getText().length() > 140) {
+        } else if (answerArea.getText().length() > CHAR_LIMIT) {
             String message = "Your answer is " + charOver + " characters\nover the limit!" +
                     "\nPlease fix your answer before creating your card.";
             createNoButtonJOption(addCardPanel, message,
@@ -333,7 +334,12 @@ public class CreateCards {
         }
     }
 
-    
+    // effects: clear all text in the question and answer area
+    protected void clear() {
+        questionArea.setText("");
+        answerArea.setText("");
+    }
+
 
     private class CuteFocusListener implements FocusListener {
         @Override
@@ -348,7 +354,6 @@ public class CreateCards {
                 JTextArea titleTextArea = (JTextArea) e.getSource();
                 userTitle = titleTextArea.getText();
                 deck.setTitle(userTitle);
-                System.out.println(userTitle); // delete later
             }
             if (e.getSource() == questionArea) {
                 charCountCheck(e);

@@ -1,6 +1,5 @@
 package ui;
 
-import model.Card;
 import model.JsonReader;
 
 import javax.imageio.ImageIO;
@@ -12,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static model.Card.NUM_ATTEMPTS;
 import static ui.CreateCards.ENTER_TITLE;
 import static ui.HelperMethods.*;
 
@@ -204,6 +202,9 @@ public class MainGUI extends JPanel {
             } else if (cmd.equals("confirm")) {
                 create.finalCharCheck();
                 System.out.println(create.getQuestion() + " : " + create.getAnswer());
+            } else if (cmd.equals("clear")) {
+            create.clear();
+            System.out.println(create.getQuestion() + " : " + create.getAnswer());
             } else if (cmd.equals("cancel")) {
                 // credits: https://stackoverflow.com/questions/18105598/closing-a-joptionpane-programmatically
                 Window[] windows = Window.getWindows();
