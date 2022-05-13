@@ -1,5 +1,5 @@
 package ui;
-
+import model.Deck;
 import model.JsonReader;
 
 import javax.imageio.ImageIO;
@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static ui.CreateCards.ENTER_TITLE;
+import static ui.CreateCards.REGEX_TITLE;
 import static ui.HelperMethods.*;
 
 public class MainGUI extends JPanel {
@@ -21,7 +21,7 @@ public class MainGUI extends JPanel {
     public final static Font CONSOLAS = new Font("Consolas", Font.BOLD, 37);
     public final static Color BRIGHT_PINK = new Color(253, 27, 96);
     public final static Color LIGHT_PINK = new Color(254, 228, 227);
-
+    public final static String ENTER_TITLE = "Type your title...";
 
     private JFrame frame;
     private JPanel cards;
@@ -31,15 +31,16 @@ public class MainGUI extends JPanel {
     private JButton loadDeck;
     private TitlePageActionListener listen;
     private CreateCards create;
+    private Deck deck;
+    private FindFile find;
     private JsonReader jsonReader;
-    public static final String JSON_STORE = "./data/CuteFlashCards.json";
 
     public MainGUI() {
-        jsonReader = new JsonReader(JSON_STORE);
         makeFrame();
         layers();
         frame.pack();
         frame.setSize(WIDTH, HEIGHT);
+        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
     }
@@ -79,17 +80,31 @@ public class MainGUI extends JPanel {
         cards = new JPanel(new CardLayout());
 //        displayTitleOptions();
 //        cards.add(titleOptionsPanel, "create warning");
-//
-        create = new CreateCards();
-        createActions();
-        cards.add(create.createDeckPanel, "create deck");
 
-//        load = new LoadDeck();
-//        loadActions();
-//        cards.add(load.loadDeckPanel, "load deck");
+//        deck = new Deck(ENTER_TITLE);
+//        create = new CreateCards(deck);
+//        createActions();
+//        cards.add(create.createDeckPanel, "create deck");
+
+        load = new LoadDeck();
+        loadActions();
+        cards.add(load.loadDeckPanel, "loading");
+
+//        find = new FindFile();
+//        findActions();
+//        cards.add(find.findFilePanel, "find file panel");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
+    }
+
+    private void findActions() {
+        JButton menu = find.getMenuButton();
+        menu.setActionCommand("return");
+        menu.addActionListener(listen);
+        JButton findFile = find.getFindFileButton();
+        findFile.setActionCommand("find file");
+        findFile.addActionListener(listen);
     }
 
     // effects: the methods and buttons that must be called
@@ -98,6 +113,13 @@ public class MainGUI extends JPanel {
         JButton menu = create.getMenuButton();
         menu.setActionCommand("create warning");
         menu.addActionListener(listen);
+        JButton absolutely = create.getAbsolutelyButton();
+        absolutely.setActionCommand("absolutely");
+        absolutely.addActionListener(listen);
+        JButton nope = create.getNopeButton();
+        nope.setActionCommand("cancel");
+        nope.addActionListener(listen);
+
         JButton addCard = create.getAddCardButton();
         addCard.setActionCommand("add card");
         addCard.addActionListener(listen);
@@ -119,7 +141,13 @@ public class MainGUI extends JPanel {
     // effects: the methods and buttons that must be called
     // from the LoadDeck class before main GUI can run it
     private void loadActions() {
-        // TO DO
+//        JButton loaded = load.getLoaded();
+//        loaded.setActionCommand("start selection");
+//        loaded.addActionListener(listen);
+
+//        JButton confirmStartChoices = load.getConfirmStartChoices();
+//        confirmStartChoices.setActionCommand("start selection");
+//        confirmStartChoices.addActionListener(listen);
     }
 
     // effects: shows the Create Deck and Load Deck option
@@ -163,6 +191,21 @@ public class MainGUI extends JPanel {
         loadDeck.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
+    // effects: loads up the previously made flashcards
+    // inspired by JsonSerializationDemo
+    // effects: loads the flashcards from file
+    private Boolean loadDeck() {
+        try {
+            jsonReader = new JsonReader(find.getSource());
+            deck = jsonReader.read();
+            System.out.println("Loaded " + deck.getTitle() + " from " + find.getSource());
+            return true;
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: " + find.getSource());
+            return false;
+        }
+    }
+
     class TitlePageActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -172,52 +215,68 @@ public class MainGUI extends JPanel {
                 cl.show(cards, "create deck");
 
             } else if (cmd.equals("load deck")) {
-                cl.show(cards, "load deck");
-                // TO DO MESSAGE
-                JOptionPane.showMessageDialog(load.loadDeckPanel, "Your cards are loading in!",
-                        "Patience, patience!", JOptionPane.INFORMATION_MESSAGE);
+                cl.show(cards, "find file panel");
+
+            } else if (cmd.equals("find file")) {
+                if (loadDeck()) {
+                    cl.show(cards, "loading");
+                } else {
+                    // credits: Leisurely Pig Line Sticker
+                    createNoButtonJOption(create.createDeckPanel, "No deck with that name exists!",
+                            "Not to be mean...but...", "src/images/sorry.png");
+                }
 
             } else if (cmd.equals("create warning")) {
                 create.menuWarnUser();
+                new MainGUI();
+                frame.dispose();
+
+            } else if (cmd.equals("return")) {
                 cl.first(cards);
 
-            } else if (cmd.equals("save")) {
+            } else if (cmd.equals("save") || cmd.equals("absolutely")) {
                 if (create.getDeck().getFlashCards().isEmpty()) {
                     createNoButtonJOption(create.createDeckPanel, "There's no cards to save!",
                             "Not to be mean...but...", "src/images/save.png");
-                } else if (create.getUserTitle() == "Add a title" ||
+                } else if (create.getUserTitle().isEmpty() ||
                         create.getUserTitle() == ENTER_TITLE) {
                     createNoButtonJOption(create.createDeckPanel, "Please choose a new title!",
                             "Not to be mean...but...", "src/images/knife.png");
+                } else if (!create.getUserTitle().matches(REGEX_TITLE)) {
+                    createNoButtonJOption(create.createDeckPanel, "Please make sure that the title only\n"
+                            + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png");
+                } else {
+                    create.saveDeck();
+                    if (cmd.equals("absolutely")) {
+                        closeCurrentWindow();
+                    }
                 }
-                create.saveDeck();
 
             } else if (cmd.equals("add card")) {
                 if (create.getUserTitle().equals(ENTER_TITLE) || create.getUserTitle().equals("")) {
-                    createNoButtonJOption(create.createDeckPanel, "Please choose a new title!",
+                    String message =  "Please choose a new title\nand make sure it only\ncontains letters and numbers.";
+                    createNoButtonJOption(create.createDeckPanel, message,
                             "Not to be mean...but...", "src/images/knife.png");
                 } else {
                     create.optionPane();
                 }
+
             } else if (cmd.equals("confirm")) {
                 create.finalCharCheck();
-                System.out.println(create.getQuestion() + " : " + create.getAnswer());
+                create.clear();
+
             } else if (cmd.equals("clear")) {
-            create.clear();
-            System.out.println(create.getQuestion() + " : " + create.getAnswer());
+                create.clear();
+
             } else if (cmd.equals("cancel")) {
-                // credits: https://stackoverflow.com/questions/18105598/closing-a-joptionpane-programmatically
-                Window[] windows = Window.getWindows();
-                for (Window window : windows) {
-                    if (window instanceof JDialog) {
-                        JDialog dialog = (JDialog) window;
-                        if (dialog.getContentPane().getComponentCount() == 1
-                                && dialog.getContentPane().getComponent(0) instanceof JOptionPane) {
-                            dialog.dispose();
-                        }
-                    }
-                }
+                closeCurrentWindow();
+
+            } else if (cmd.equals("start selection")) {
+                load.loadingScreen.setVisible(false);
+                load.optionsPanel.setVisible(true);
+                // TODO: fix loading in the title and implement the other buttons
             }
         }
     }
+
 }

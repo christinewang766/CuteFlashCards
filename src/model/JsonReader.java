@@ -1,7 +1,5 @@
 package model;
 
-import model.Card;
-import model.Deck;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,17 +43,17 @@ public class JsonReader {
 
     // effects: parses deck from JSON object and returns it
     private Deck parseWorkRoom(JSONObject jsonObject) {
-        String name = jsonObject.getString("name");
-        Deck boc = new Deck(name);
-        addBook(boc, jsonObject);
-        return boc;
+        String title = jsonObject.getString("title");
+        Deck deck = new Deck(title);
+        addDeck(deck, jsonObject);
+        return deck;
     }
 
 
     // modifies: deck
     // effects: parses cards from JSON object and adds them to deck
-    private void addBook(Deck deck, JSONObject jsonObject) {
-        JSONArray jsonArray = jsonObject.getJSONArray("book");
+    private void addDeck(Deck deck, JSONObject jsonObject) {
+        JSONArray jsonArray = jsonObject.getJSONArray("deck");
         for (Object json : jsonArray) {
             JSONObject nextCard = (JSONObject) json;
             addCard(deck, nextCard);

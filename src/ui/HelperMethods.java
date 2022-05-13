@@ -8,8 +8,8 @@ import java.io.IOException;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
 import static ui.CreateCards.CALIBRI_BOLD;
-import static ui.MainGUI.BRIGHT_PINK;
-import static ui.MainGUI.LIGHT_PINK;
+import static ui.MainGUI.*;
+import static ui.MainGUI.HEIGHT;
 
 public class HelperMethods {
 
@@ -40,7 +40,7 @@ public class HelperMethods {
         try {
             Font smallCalibri = new Font("Calibri", Font.BOLD, 25);
             Image img = ImageIO.read(new File("src/images/button.png"));
-            Image scaledImg = img.getScaledInstance(368/2, 111/2, java.awt.Image.SCALE_SMOOTH);
+            Image scaledImg = img.getScaledInstance(368 / 2, 111 / 2, java.awt.Image.SCALE_SMOOTH);
             ImageIcon buttonImage = new ImageIcon(scaledImg);
             button.setIcon(buttonImage);
             button.setFont(smallCalibri);
@@ -50,21 +50,26 @@ public class HelperMethods {
         }
     }
 
+    // effects: creates an icon from given source
+    public static ImageIcon createSmallIcon(String source) {
+        // credit: Emekat http://pixelartmaker.com/art/ad1ae9084485dac
+        Image img = null;
+        try {
+            img = ImageIO.read(new File(source));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image scaledImg = img.getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(scaledImg);
+        return icon;
+    }
+
     // effects: makes a JOptionPane without a button to warn user
     public static void createNoButtonJOption(JPanel panel, String message, String title, String source) {
-        try {
-            // credit: Emekat http://pixelartmaker.com/art/ad1ae9084485dac
-            Image img = ImageIO.read(new File(source));
-            Image scaledImg = img.getScaledInstance(130, 140, java.awt.Image.SCALE_SMOOTH);
-            ImageIcon icon = new ImageIcon(scaledImg);
-
-            frameChanges();
-
-            JOptionPane.showOptionDialog(panel, message, title,
-                    JOptionPane.DEFAULT_OPTION,JOptionPane.INFORMATION_MESSAGE, icon, new Object[]{}, null);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        frameChanges();
+        JOptionPane.showOptionDialog(panel, message, title,
+                JOptionPane.DEFAULT_OPTION,JOptionPane.INFORMATION_MESSAGE,
+                createSmallIcon(source), new Object[]{}, null);
     }
 
     // effects: changes the background of JOption and other UI panels
@@ -74,5 +79,47 @@ public class HelperMethods {
         frameChanges.put("Panel.background",LIGHT_PINK);
         UIManager.put("OptionPane.messageFont", new Font("Consolas", Font.BOLD, 25));
         UIManager.put("OptionPane.buttonFont", CALIBRI_BOLD);
+    }
+
+    // effects: closes the current window or JOptionPane
+    public static void closeCurrentWindow() {
+        // credits: https://stackoverflow.com/questions/18105598/closing-a-joptionpane-programmatically
+        Window[] windows = Window.getWindows();
+        for (Window window : windows) {
+            if (window instanceof JDialog) {
+                JDialog dialog = (JDialog) window;
+                if (dialog.getContentPane().getComponentCount() == 1
+                        && dialog.getContentPane().getComponent(0) instanceof JOptionPane) {
+                    dialog.dispose();
+                }
+            }
+        }
+    }
+
+    public static JViewport backgroundViewPort(String source) {
+        // assigns a static background image
+        ImageIcon imageIcon = new ImageIcon(source);
+        Image image = imageIcon.getImage();
+        Image scaledImg = image.getScaledInstance(WIDTH, HEIGHT, java.awt.Image.SCALE_SMOOTH);
+
+        // credit: https://coderanch.com/t/700884/java/static-background-scrollpane
+        JViewport viewport = new JViewport() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                g.drawImage(scaledImg, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
+        return viewport;
+    }
+
+    // effects: brings you back to the main title page,
+    // congratulates/prompts you to save your spot/progress
+    public static JButton createMenuButton() {
+        JButton menuButton = new JButton("Menu");
+        makeJOptionButtons(menuButton);
+        return menuButton;
     }
 }

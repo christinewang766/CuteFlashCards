@@ -4,7 +4,6 @@ import model.Card;
 import model.Deck;
 import model.JsonWriter;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
@@ -12,7 +11,9 @@ import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.*;
 import java.util.Map;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
@@ -22,23 +23,22 @@ import static ui.MainGUI.*;
 
 public class CreateCards {
 
-    public final static Font CALIBRI_ITALIC = new Font("Calibri", Font.ITALIC, 40);
     public final static Font CALIBRI_BOLD = new Font("Calibri", Font.BOLD, 30);
-    public final static String ENTER_TITLE = "Type your title...";
     public final static int CHAR_LIMIT = 189;
+    public final static String REGEX_TITLE = "[a-zA-Z0-9 ._]*";
 
     protected JPanel createDeckPanel;
-    private JsonWriter jsonWriter;
     protected Deck deck;
     private JPanel scrollArea;
     private JPanel header;
-    private JTextArea title;
+    protected JTextArea title;
     private String userTitle;
-    private JButton addCardButton;
     private JButton menuButton;
     private JButton saveButton;
+    private JButton addButton;
+    private JButton okay;
+    private JButton nope;
     private JScrollPane scrollPane;
-    private Card newCard;
     private CuteFocusListener fListen;
 
     private JPanel addCardPanel;
@@ -46,7 +46,7 @@ public class CreateCards {
     private JButton confirm;
     private JButton cancel;
     private JButton clear;
-    private Icon icon;
+    private JButton startButton;
 
     private String question;
     private String answer;
@@ -54,13 +54,13 @@ public class CreateCards {
     private RoundJTextArea questionArea;
     private RoundJTextArea answerArea;
 
-    public CreateCards() {
-        fListen = new CuteFocusListener();
-        jsonWriter = new JsonWriter(JSON_STORE);
+    private String source;
+    private JsonWriter jsonWriter;
 
-        userTitle = "Add a title";
-        deck = new Deck(userTitle);
-        newCard = null;
+    public CreateCards(Deck deck) {
+        fListen = new CuteFocusListener();
+        userTitle = "";
+        this.deck = deck;
         displayCreateDeck();
 
         question = "";
@@ -75,6 +75,7 @@ public class CreateCards {
         createDeckPanel.setBackground(LIGHT_PINK);
         setUpHeader();
         setUpScrollPane();
+        startButton();
     }
 
     // creates the static header that doesn't move with scroll
@@ -82,25 +83,12 @@ public class CreateCards {
 
         header = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         header.add(displayTitle());
-        menuButton(header);
-        createCard(header);
-        saveButton(header);
+        menuButton();
+        createCard();
+        saveButton();
         header.setBackground(LIGHT_PINK);
 
         createDeckPanel.add(header, BorderLayout.NORTH);
-    }
-
-    // effects: constructs a button to save the deck of flashcards
-    private void saveButton(JPanel panel) {
-        ImageIcon imageIcon = new ImageIcon("src/images/button.png");
-        Image image = imageIcon.getImage();
-        Image newImg = image.getScaledInstance(184, 70, java.awt.Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(newImg);
-
-        saveButton = new JButton("Save", imageIcon);
-        saveButton.setFont(CALIBRI_BOLD);
-        buttonHelper(saveButton);
-        panel.add(saveButton);
     }
 
     // effects: creates the vertical scroll pane to look at created cards
@@ -112,92 +100,99 @@ public class CreateCards {
         scrollPane = new JScrollPane(scrollArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setWheelScrollingEnabled(true);
-        scrollPane.setPreferredSize(new Dimension(WIDTH - 100, HEIGHT - 240));
+        scrollPane.setPreferredSize(new Dimension(WIDTH - 90, HEIGHT - 230));
         scrollPane.setBorder(createEmptyBorder());
 
-        // assigns a static background image
-        ImageIcon imageIcon = new ImageIcon("src/images/createCardBackground.png");
-        Image image = imageIcon.getImage();
-        Image scaledImg = image.getScaledInstance(WIDTH, HEIGHT, java.awt.Image.SCALE_SMOOTH);
-
-        // credit: https://coderanch.com/t/700884/java/static-background-scrollpane
-        JViewport viewport = new JViewport() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                g.drawImage(scaledImg, 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-
-        scrollPane.setViewport(viewport);
+        scrollPane.setViewport(backgroundViewPort("src/images/createCardBackground.png"));
         scrollPane.setViewportView(scrollArea);
         createDeckPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     // effects: displays an editable title for the new deck
     private JTextArea displayTitle() {
-
-        Map attributes = CALIBRI_ITALIC.getAttributes();
+        Font calItalic = new Font("Calibri", Font.ITALIC, 40);
+        Map attributes = calItalic.getAttributes();
         attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-        userTitle = "";
 
-        title = new RoundJTextArea("");
+        title = new RoundJTextArea(deck.getTitle());
+
         title.addFocusListener(fListen);
-        title.setText(ENTER_TITLE);
         title.setColumns(20);
-        title.setFont(CALIBRI_ITALIC.deriveFont(attributes));
+        title.setFont(calItalic.deriveFont(attributes));
 
         textAreaHelper(title);
         return title;
     }
 
+    // effects: common code among all three add card buttons
+    private JButton createCardsButtonHelper(JButton button, String source, int width, int height) {
+        ImageIcon imageIcon = new ImageIcon(source);
+        Image image = imageIcon.getImage();
+        Image newImg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(newImg);
+        button.setIcon(imageIcon);
+        button.setFont(CALIBRI_BOLD);
+        buttonHelper(button);
+        return button;
+    }
+
     // effects: brings you back to the main title page,
     // congratulates/prompts you to save your spot/progress
-    public void menuButton(JPanel panel) {
-        ImageIcon imageIcon = new ImageIcon("src/images/button.png");
-        Image image = imageIcon.getImage();
-        Image newImg = image.getScaledInstance(184, 70, java.awt.Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(newImg);
-
-        menuButton = new JButton("Menu", imageIcon);
-        menuButton.setFont(CALIBRI_BOLD);
-        buttonHelper(menuButton);
+    private void menuButton() {
+        menuButton = createMenuButton();
         menuButton.setBorder(BorderFactory.createCompoundBorder(
                 menuButton.getBorder(),
                 createEmptyBorder(0, 30, 0, 0)));
-        panel.add(menuButton);
+        header.add(menuButton);
+    }
+
+    // effects: constructs a button to save the deck of flashcards
+    private void saveButton() {
+        saveButton = new JButton("Save");
+        makeJOptionButtons(saveButton);
+        header.add(saveButton);
     }
 
     // effects: adds a new card to the deck
-    private void createCard(JPanel panel) {
-        ImageIcon imageIcon = new ImageIcon("src/images/button.png");
-        Image image = imageIcon.getImage();
-        Image newImg = image.getScaledInstance(184, 70, java.awt.Image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(newImg);
-
-        addCardButton = new JButton("Add Card", imageIcon);
-        addCardButton.setFont(CALIBRI_BOLD);
-        buttonHelper(addCardButton);
-        panel.add(addCardButton);
+    private void createCard() {
+        addButton = new JButton("Add Card");
+        makeJOptionButtons(addButton);
+        header.add(addButton);
         frameChanges();
+    }
+
+    // effects: opens up the options to start studying
+    // includes theme, shuffle, starred only
+    private void startButton() {
+        startButton = new JButton("Start");
+        startButton.setBorder(BorderFactory.createCompoundBorder(
+                startButton.getBorder(),
+                createEmptyBorder(0, 1200, 0, 0)));
+        createCardsButtonHelper(startButton, "src/images/start.png",140,120);
+        scrollArea.add(startButton, BorderLayout.SOUTH);
     }
 
     // effects: a pop up message asking if user would like to save their cards
     // before exiting to the menu
-    void menuWarnUser() {
-    }
+    protected void menuWarnUser() {
 
-    // credits: JsonSerializationDemo CPSC 210
-    // effects: saves the new deck of flashcards to file
-    protected void saveDeck() {
-        try {
-            jsonWriter.open();
-            jsonWriter.write(deck);
-            jsonWriter.close();
-            System.out.println("Saved " + deck.getTitle() + " to " + JSON_STORE);
-        } catch (FileNotFoundException e) {
-            System.out.println("Unable to write to file: " + JSON_STORE);
+        JButton[] buttons = {okay, nope};
+
+        if (!deck.getFlashCards().isEmpty()) {
+
+            File f = new File("data");
+            FilenameFilter filter = (f1, name) -> name.equals(userTitle + ".json");
+            if (f.list(filter).length > 0) {
+                JOptionPane.showOptionDialog(createDeckPanel, "Save and overwrite a file?",
+                        "Menu Warning",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        createSmallIcon("src/images/save.png"),
+                        buttons, buttons[0]);
+            } else {
+                JOptionPane.showOptionDialog(createDeckPanel, "Would you like to save your cards?",
+                        "Menu Warning", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        createSmallIcon("src/images/save.png"), buttons, buttons[0]);
+            }
         }
     }
 
@@ -207,15 +202,27 @@ public class CreateCards {
     }
 
     public JButton getAddCardButton () {
-        return this.addCardButton;
+        return this.addButton;
     }
 
     public JButton getSaveButton () {
         return this.saveButton;
     }
 
-    public String getUserTitle () {
+    public JButton getAbsolutelyButton() {
+        return this.okay;
+    }
+
+    public JButton getNopeButton () {
+        return this.nope;
+    }
+
+    public String getUserTitle() {
         return this.userTitle;
+    }
+
+    public void setUserTitle(String newTitle) {
+        this.userTitle = newTitle;
     }
 
     public Deck getDeck() {
@@ -243,6 +250,10 @@ public class CreateCards {
         return this.answer;
     }
 
+
+    // TODO SPLIT INTO SEPARATE CLASS LATER
+    // the pop up panel to add new cards
+
     private void decoratePanel() {
         addCardPanel = new JPanel(new GridBagLayout());
 
@@ -262,18 +273,6 @@ public class CreateCards {
 
         addCardPanel.add(questionArea);
         addCardPanel.add(answerArea);
-
-        String[] options = new String[2];
-        options[0] = "Confirm";
-        options[1] = "Cancel";
-
-        try {
-            // PLACEHOLDER ICON
-            Image img = ImageIO.read(new File("src/images/heart.png"));
-            icon = new ImageIcon(img);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     // effects: sets up the option panel
@@ -282,7 +281,7 @@ public class CreateCards {
         JButton[] buttons = {confirm, cancel, clear};
 
         JOptionPane.showOptionDialog(createDeckPanel, textLabels, "Add Card",
-                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, icon,
+                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, createSmallIcon("src/images/turnips.png"),
                 buttons, buttons[0]);
     }
 
@@ -294,6 +293,11 @@ public class CreateCards {
         makeJOptionButtons(cancel);
         clear = new JButton("Clear");
         makeJOptionButtons(clear);
+
+        okay = new JButton("Okay!");
+        makeJOptionButtons(okay);
+        nope = new JButton("Nope.");
+        makeJOptionButtons(nope);
     }
 
     // effects: checks if the answer/question text is < 189 char
@@ -326,10 +330,13 @@ public class CreateCards {
                     "\nPlease fix your answer before creating your card.";
             createNoButtonJOption(addCardPanel, message,
                     "Not to be mean...but...", "src/images/knife.png");
+        } else if (questionArea.getText().length() == 0 || answerArea.getText().length() == 0) {
+            createNoButtonJOption(addCardPanel, "You may not have empty questions or answers.",
+                    "Not to be mean...but...", "src/images/knife.png");
         } else {
             question = questionArea.getText();
             answer = answerArea.getText();
-            newCard = new Card(question, answer, false, false, NUM_ATTEMPTS, true);
+            Card newCard = new Card(question, answer, false, false, NUM_ATTEMPTS, true);
             deck.addFlashCard(newCard);
         }
     }
@@ -340,6 +347,30 @@ public class CreateCards {
         answerArea.setText("");
     }
 
+    // credits: JsonSerializationDemo CPSC 210
+    // effects: saves the new deck of flashcards to file
+    protected void saveDeck() {
+        source = "./data/" + userTitle + ".json";
+
+        try {
+            Path path = Paths.get(source);
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+            Files.createFile(path);
+            jsonWriter = new JsonWriter(source);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            jsonWriter.open();
+            jsonWriter.write(deck);
+            jsonWriter.close();
+            System.out.println("Saved " + userTitle + " to " + source);
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + source);
+        }
+    }
 
     private class CuteFocusListener implements FocusListener {
         @Override
@@ -352,8 +383,10 @@ public class CreateCards {
         public void focusLost(FocusEvent e) {
             if (e.getSource() == title) {
                 JTextArea titleTextArea = (JTextArea) e.getSource();
-                userTitle = titleTextArea.getText();
-                deck.setTitle(userTitle);
+                if (titleTextArea.getText().matches(REGEX_TITLE)) {
+                    userTitle = titleTextArea.getText();
+                    deck.setTitle(userTitle);
+                }
             }
             if (e.getSource() == questionArea) {
                 charCountCheck(e);
