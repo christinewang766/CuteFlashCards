@@ -12,6 +12,7 @@ import static model.Card.NUM_ATTEMPTS;
 
 public class Deck implements Writable {
 
+    private ArrayList<Card> deckCards;
     private ArrayList<Card> flashCards;
     private ArrayList<Card> completedFlashCards;
     private ArrayList<Card> starredFlashCards;
@@ -21,6 +22,7 @@ public class Deck implements Writable {
 
     public Deck(String title) {
         this.title = title;
+        this.deckCards = new ArrayList<>();
         this.flashCards = new ArrayList<>();
         this.completedFlashCards = new ArrayList<>();
         this.starredFlashCards = new ArrayList<>();
@@ -76,15 +78,26 @@ public class Deck implements Writable {
         }
     }
 
-    // effects: deletes the cards marks complete from flashcards
+    // effects: deletes the cards marked complete from flashcards
     private ArrayList<Card> getUnfinishedFlashcards() {
         deleteAllPrevious();
         return this.flashCards;
     }
 
     // effects: shuffles the deck
-    public void shuffle() {
-        Collections.shuffle(this.flashCards);
+    public void shuffle(List<Card> cards) {
+        Collections.shuffle(cards);
+    }
+
+    // requires: only called when there are no "completed" cards
+    // effects: filters out the not-starred flashcards
+    public ArrayList<Card> starredOnly() {
+        for (Card card : this.flashCards) {
+            if (card.getStarred()) {
+                starredFlashCards.add(card);
+            }
+        }
+        return this.starredFlashCards;
     }
 
 
@@ -183,6 +196,12 @@ public class Deck implements Writable {
             jsonArray.put(t.toJson());
         }
 
+        for (Card t : this.deckCards) {
+            if (!getUnfinishedFlashcards().contains(t)
+            && !completedFlashCards.contains(t)) {
+                jsonArray.put(t.toJson());
+            }
+        }
         return jsonArray;
     }
 
@@ -204,6 +223,18 @@ public class Deck implements Writable {
 
     public ArrayList<Card> getCompletedFlashCards() {
         return this.completedFlashCards;
+    }
+
+    public ArrayList<Card> getCards() {
+        return this.deckCards;
+    }
+
+    public void setCards(ArrayList<Card> cards) {
+        this.deckCards = cards;
+    }
+
+    public void setFlashCards(ArrayList<Card> cards) {
+        this.flashCards = cards;
     }
 
     public Card getCurrentCard() {

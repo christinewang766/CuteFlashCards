@@ -51,7 +51,7 @@ public class HelperMethods {
     }
 
     // effects: creates an icon from given source
-    public static ImageIcon createSmallIcon(String source) {
+    public static ImageIcon createSmallIcon(String source, int width, int height) {
         // credit: Emekat http://pixelartmaker.com/art/ad1ae9084485dac
         Image img = null;
         try {
@@ -59,17 +59,18 @@ public class HelperMethods {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Image scaledImg = img.getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
+        Image scaledImg = img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaledImg);
         return icon;
     }
 
     // effects: makes a JOptionPane without a button to warn user
-    public static void createNoButtonJOption(JPanel panel, String message, String title, String source) {
+    public static void createNoButtonJOption(JPanel panel, String message, String title, String source,
+                                             int width, int height) {
         frameChanges();
         JOptionPane.showOptionDialog(panel, message, title,
                 JOptionPane.DEFAULT_OPTION,JOptionPane.INFORMATION_MESSAGE,
-                createSmallIcon(source), new Object[]{}, null);
+                createSmallIcon(source, width, height), new Object[]{}, null);
     }
 
     // effects: changes the background of JOption and other UI panels
