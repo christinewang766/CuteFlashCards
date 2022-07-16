@@ -83,7 +83,7 @@ public class EditPanel {
         cardButtonHelper(deleteButton, "src/images/delete.png");
         deleteButton.addActionListener(e -> {
             deck.getFlashCards().remove(this.index);
-            cc.displayCreatedCards(deck.getFlashCards());
+            cc.displayCreatedCards();
         });
     }
 

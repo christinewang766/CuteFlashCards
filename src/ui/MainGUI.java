@@ -153,7 +153,7 @@ public class MainGUI extends JPanel {
         loaded.addActionListener(e -> {
             cl.show(cards, "create deck");
             create.title.setText(find.getTitle());
-            create.displayCreatedCards(deck.getFlashCards());
+            create.displayCreatedCards();
         });
     }
 
@@ -165,12 +165,12 @@ public class MainGUI extends JPanel {
                 create.menuWarnUser();
             } else {
                 closeCurrentWindow();
-                create.clearScrollArea();
             }
             cl.first(cards);
             create.title.setText(ENTER_TITLE);
             create.getQuestionArea().setText(TYPE_QUESTION_HERE);
             create.getAnswerArea().setText(TYPE_ANSWER_HERE);
+            create.clearScrollArea();
         });
     }
 }

@@ -342,16 +342,16 @@ public class CreateCards {
         } else if (repeatQuestion()) {
         } else {
             addCard();
-            displayCreatedCards(deck.getFlashCards());
+            displayCreatedCards();
         }
     }
 
     // effects: after passing the other checks, show added cards
-    protected void displayCreatedCards(ArrayList<Card> cards) {
+    protected void displayCreatedCards() {
         clearScrollArea();
         int i;
         i = 0;
-        for (Card card : cards) {
+        for (Card card : deck.getFlashCards()) {
             EditPanel ep = new EditPanel(deck, card, this);
             ep.changeIndex(i);
             scrollArea.add(ep.showCard(),"center, gapy 20");
