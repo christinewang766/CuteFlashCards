@@ -199,4 +199,8 @@ public class FindFile {
     public String getTitle() {
         return textField.getText();
     }
+
+    public Deck getFindDeck() {
+        return this.deck;
+    }
 }
