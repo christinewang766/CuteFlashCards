@@ -4,12 +4,9 @@ import model.Card;
 import model.Deck;
 import model.JsonWriter;
 import net.miginfocom.swing.MigLayout;
-import sun.security.x509.AlgIdDSA;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.font.TextAttribute;
@@ -21,9 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
 import static model.Card.NUM_ATTEMPTS;
@@ -35,6 +29,8 @@ public class CreateCards {
     public final static Font CALIBRI_BOLD = new Font("Calibri", Font.BOLD, 30);
     public final static int CHAR_LIMIT = 250;
     public final static String REGEX_TITLE = "[a-zA-Z0-9 ._]*";
+    public static final String TYPE_QUESTION_HERE = "Type your question here...\n(" + CHAR_LIMIT + " characters max)";
+    public static final String TYPE_ANSWER_HERE = "Type your answer here...\n(" + CHAR_LIMIT + " characters max)";
     private JFrame frame;
 
     protected JPanel createDeckPanel;
@@ -65,14 +61,13 @@ public class CreateCards {
     private RoundJTextArea answerArea;
 
     private JsonWriter jsonWriter;
-    private EditPanel editPanel;
 
     public CreateCards(Deck deck, JFrame frame) {
         this.frame = frame;
         fListen = new CuteFocusListener();
         userTitle = "";
         this.deck = deck;
-        displayCreateDeck();
+        display();
 
         question = "";
         answer = "";
@@ -81,14 +76,12 @@ public class CreateCards {
     }
 
     // effects: shows the flashcards being made
-    protected void displayCreateDeck() {
+    protected void display() {
         createDeckPanel = new JPanel(new FlowLayout((int) Component.CENTER_ALIGNMENT, 40, 40));
         createDeckPanel.setBackground(LIGHT_PINK);
         setUpHeader();
         setUpScrollPane();
         startButton();
-        editPanel = new EditPanel(deck, new Card("question", "answer", false, false,
-                NUM_ATTEMPTS, true));
     }
 
     // creates the static header that doesn't move with scroll
@@ -159,11 +152,6 @@ public class CreateCards {
         menuButton.setBorder(BorderFactory.createCompoundBorder(
                 menuButton.getBorder(),
                 createEmptyBorder(0, 30, 0, 0)));
-        menuButton.addActionListener(e -> {
-            menuWarnUser();
-            new MainGUI();
-            frame.dispose();
-        });
         header.add(menuButton);
     }
 
@@ -174,15 +162,15 @@ public class CreateCards {
         saveButton.addActionListener(e -> {
             if (deck.getFlashCards().isEmpty()) {
                 createNoButtonJOption(createDeckPanel, "There's no cards to save!",
-                        "Not to be mean...but...", "src/images/save.png",100,100);
+                        "Not to be mean...but...", "src/images/save.png", 100, 100);
             } else if (userTitle.isEmpty() ||
                     userTitle == ENTER_TITLE) {
                 createNoButtonJOption(createDeckPanel, "Please choose a new title!",
-                        "Not to be mean...but...", "src/images/knife.png",110,110);
+                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
             } else if (!userTitle.matches(REGEX_TITLE)) {
                 createNoButtonJOption(createDeckPanel, "Please make sure that the title only\n"
                                 + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
-                        110,110);
+                        110, 110);
             } else {
                 saveDeck();
             }
@@ -198,7 +186,7 @@ public class CreateCards {
             if (userTitle.equals(ENTER_TITLE) || userTitle.equals("")) {
                 String message = "Please choose a new title\nand make sure it only\ncontains letters and numbers.";
                 createNoButtonJOption(createDeckPanel, message,
-                        "Not to be mean...but...", "src/images/knife.png",110,110);
+                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
             } else {
                 optionPane();
             }
@@ -214,8 +202,8 @@ public class CreateCards {
         startButton.setBorder(BorderFactory.createCompoundBorder(
                 startButton.getBorder(),
                 createEmptyBorder(0, 1200, 0, 0)));
-        createCardsButtonHelper(startButton, "src/images/start.png",140,120);
-        scrollArea.add(startButton, "south, gapy 420");
+        createCardsButtonHelper(startButton, "src/images/start.png", 140, 120);
+        scrollArea.add(startButton, "south, gapy 70");
     }
 
     // effects: a pop up message asking if user would like to save their cards
@@ -242,17 +230,17 @@ public class CreateCards {
     // TODO SPLIT INTO SEPARATE CLASS LATER
     // the pop up panel to add new cards
 
-    private void decoratePanel() {
+    protected void decoratePanel() {
         addCardPanel = new JPanel(new GridBagLayout());
 
-        questionArea = new RoundJTextArea("Type your question here...\n(" + CHAR_LIMIT + " characters max)");
+        questionArea = new RoundJTextArea(TYPE_QUESTION_HERE);
         textAreaHelper(questionArea);
         questionArea.setColumns(25);
         questionArea.setRows(10);
         questionArea.setFont(new Font("Calibri", Font.BOLD, 25));
         questionArea.addFocusListener(fListen);
 
-        answerArea = new RoundJTextArea("Type your answer here...\n(" + CHAR_LIMIT + " characters max)");
+        answerArea = new RoundJTextArea(TYPE_ANSWER_HERE);
         answerArea.setColumns(25);
         answerArea.setRows(10);
         textAreaHelper(answerArea);
@@ -275,34 +263,34 @@ public class CreateCards {
     }
 
     // effects: create the confirm and cancel button
-    private void makeCButtons() {
+    protected void makeCButtons() {
         confirm = new JButton("Confirm");
         makeJOptionButtons(confirm);
         confirm.addActionListener(e -> {
             finalCharCheck();
-            clear();
+            clearCardText();
         });
         cancel = new JButton("Cancel");
         makeJOptionButtons(cancel);
         cancel.addActionListener(e -> closeCurrentWindow());
         clear = new JButton("Clear");
         makeJOptionButtons(clear);
-        clear.addActionListener(e -> clear());
+        clear.addActionListener(e -> clearCardText());
 
         okay = new JButton("Okay!");
         makeJOptionButtons(okay);
         okay.addActionListener(e -> {
             if (deck.getFlashCards().isEmpty()) {
                 createNoButtonJOption(createDeckPanel, "There's no cards to save!",
-                        "Not to be mean...but...", "src/images/save.png",100,100);
+                        "Not to be mean...but...", "src/images/save.png", 100, 100);
             } else if (userTitle.isEmpty() ||
                     userTitle == ENTER_TITLE) {
                 createNoButtonJOption(createDeckPanel, "Please choose a new title!",
-                        "Not to be mean...but...", "src/images/knife.png",110,110);
+                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
             } else if (!userTitle.matches(REGEX_TITLE)) {
-                createNoButtonJOption(createDeckPanel, "Please make sure that the title only\n"
-                                + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
-                        110,110);
+                createNoButtonJOption(createDeckPanel, "Title may only contain \n"
+                                + "letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
+                        110, 110);
             } else {
                 saveDeck();
                 closeCurrentWindow();
@@ -310,30 +298,16 @@ public class CreateCards {
         });
         nope = new JButton("Nope.");
         makeJOptionButtons(nope);
-        nope.addActionListener(e -> {
-            // credits: https://stackoverflow.com/questions/18105598/closing-a-joptionpane-programmatically
-            Window[] windows = Window.getWindows();
-            for (Window window : windows) {
-                if (window instanceof JDialog) {
-                    JDialog dialog = (JDialog) window;
-                    if (dialog.getContentPane().getComponentCount() == 1
-                            && dialog.getContentPane().getComponent(0) instanceof JOptionPane) {
-                        dialog.dispose();
-                    }
-                }
-            }
-            closeCurrentWindow();
-        });
     }
 
-    // effects: checks if the answer/question text is < 189 char
+    // effects: checks if the answer/question text is <= 250 char
     private void charCountCheck(FocusEvent e) {
         JTextArea textArea = (JTextArea) e.getSource();
         if (textArea.getText().length() > CHAR_LIMIT) {
             int charOver = textArea.getText().length() - CHAR_LIMIT;
             String message = "You are " + charOver + " characters\nover the limit!";
             createNoButtonJOption(addCardPanel, message, "Character Max Reached", "src/images/knife.png",
-                    110,110);
+                    110, 110);
         } else {
             if (e.getSource() == questionArea) {
                 question = textArea.getText();
@@ -351,21 +325,43 @@ public class CreateCards {
             String message = "Your question is " + charOver + " characters\nover the limit!" +
                     "\nPlease fix your question before creating your card.";
             createNoButtonJOption(addCardPanel, message,
-                    "Not to be mean...but...", "src/images/knife.png",110,110);
+                    "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else if (answerArea.getText().length() > CHAR_LIMIT) {
             String message = "Your answer is " + charOver + " characters\nover the limit!" +
                     "\nPlease fix your answer before creating your card.";
             createNoButtonJOption(addCardPanel, message,
-                    "Not to be mean...but...", "src/images/knife.png",110,110);
+                    "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else if (questionArea.getText().length() == 0 || answerArea.getText().length() == 0) {
             createNoButtonJOption(addCardPanel, "You may not have empty questions or answers.",
-                    "Not to be mean...but...", "src/images/knife.png",110,110);
+                    "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else if (repeatQuestion()) {
         } else {
-            // TODO
-            editPanel.setCard(addCard());
-            scrollArea.add(editPanel.printCardToScroll(), "center, gapy 20");
-            resetScrollPane();
+            // TODO EDIT PANEL
+            addCard();
+            displayCreatedCards();
+        }
+    }
+
+    // effects: after passing the other checks, show added cards
+    protected void displayCreatedCards() {
+        clearScrollArea();
+        int i;
+        i = 0;
+        for (Card card : deck.getFlashCards()) {
+            EditPanel ep = new EditPanel(deck, card, this);
+            ep.changeIndex(i);
+            scrollArea.add(ep.showCard(),"center, gapy 20");
+            i++;
+        }
+        resetScrollPane();
+    }
+
+    // effects: deletes the display of previous cards on screen
+    protected void clearScrollArea() {
+        for(Component c : scrollArea.getComponents()) {
+            if (!(c instanceof JButton)) {
+                scrollArea.remove(c);
+            }
         }
     }
 
@@ -377,18 +373,13 @@ public class CreateCards {
                         "Not to be mean...but...", "src/images/knife.png", 110, 110);
                 return true;
             }
-            if (card.getAnswer().equals(answerArea.getText())) {
-                createNoButtonJOption(addCardPanel, "Another card already has the same answer!",
-                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
-                return true;
-            }
         }
         return false;
     }
 
     // effects: assigns the question and answer of the card
     // creates a new card and adds that to the deck's flashcards
-    private Card addCard() {
+    private void addCard() {
         question = questionArea.getText();
         answer = answerArea.getText();
         Card newCard = new Card(question, answer, false, false, NUM_ATTEMPTS, true);
@@ -396,11 +387,10 @@ public class CreateCards {
         // assigns created flashcard deck as the deckCards
         // to preserve the original set before filtering
         deck.setCards(deck.getFlashCards());
-        return newCard;
     }
 
     // effects: clear all text in the question and answer area
-    protected void clear() {
+    protected void clearCardText() {
         questionArea.setText("");
         answerArea.setText("");
     }
@@ -430,9 +420,23 @@ public class CreateCards {
         }
     }
 
+    public JButton getNopeButton() {
+        return this.nope;
+    }
+
+    public JButton getMenuButton() {
+        return this.menuButton;
+    }
+
+    public RoundJTextArea getQuestionArea() {
+        return this.questionArea;
+    }
+
+    public RoundJTextArea getAnswerArea() {
+        return this.answerArea;
+    }
+
     private class CuteFocusListener implements FocusListener {
-        String question;
-        String answer;
 
         @Override
         public void focusGained(FocusEvent e) {

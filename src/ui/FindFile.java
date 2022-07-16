@@ -190,16 +190,13 @@ public class FindFile {
     }
 
     // getters
-    public JButton getFindFileButton() {
-        return this.findFileButton;
-    }
-
-    public JButton getMenuButton() {
-        return this.menuButton;
-    }
 
     public String getSource() {
         this.source = "./data/" + textField.getText() + ".json";
         return this.source;
+    }
+
+    public String getTitle() {
+        return textField.getText();
     }
 }

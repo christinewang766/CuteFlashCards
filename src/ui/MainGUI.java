@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import static ui.CreateCards.TYPE_ANSWER_HERE;
+import static ui.CreateCards.TYPE_QUESTION_HERE;
 import static ui.HelperMethods.*;
 
 public class MainGUI extends JPanel {
@@ -59,6 +61,7 @@ public class MainGUI extends JPanel {
     }
 
     // effects: the entire GUI, essentially
+    //          the main frame
     private void makeFrame() {
         frame = new JFrame("Cutsey Cards");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,9 +80,17 @@ public class MainGUI extends JPanel {
 
         create = new CreateCards(deck, frame);
         cards.add(create.createDeckPanel, "create deck");
+        // effects: if user creates an empty deck and returns to menu
+        // then user goes back to menu with no message
+        backToMenu(false, create.getMenuButton());
+        // effects: if user creates a deck and refuses to save then
+        // user is taken back to menu and deck in progress vanishes
+        backToMenu(true, create.getNopeButton());
 
-        load = new LoadDeck(deck);
+
+        load = new LoadDeck(deck, create);
         cards.add(load.loadDeckPanel, "loading");
+        loadActions();
 
         find = new FindFile(deck, frame, load, create, cards);
         cards.add(find.findFilePanel, "find file panel");
@@ -133,5 +144,33 @@ public class MainGUI extends JPanel {
         panel.add(loadDeck);
         createDeck.setAlignmentX(Component.CENTER_ALIGNMENT);
         loadDeck.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    // effects: after loading a deck, button takes user
+    // to the create card/editing page
+    private void loadActions() {
+        JButton loaded = load.getLoadedButton();
+        loaded.addActionListener(e -> {
+            cl.show(cards, "create deck");
+            create.title.setText(find.getTitle());
+            create.displayCreatedCards();
+        });
+    }
+
+    // effects: brings user back to menu, may close previous option window
+    private void backToMenu(Boolean closeWindow, JButton button) {
+        JButton b = button;
+        b.addActionListener(e -> {
+            if (!closeWindow) {
+                create.menuWarnUser();
+            } else {
+                closeCurrentWindow();
+                create.clearScrollArea();
+            }
+            cl.first(cards);
+            create.title.setText(ENTER_TITLE);
+            create.getQuestionArea().setText(TYPE_QUESTION_HERE);
+            create.getAnswerArea().setText(TYPE_ANSWER_HERE);
+        });
     }
 }

@@ -31,12 +31,14 @@ public class LoadDeck {
     private JButton confirmStartChoices;
     private JButton loaded;
     private JPanel in;
+    private CreateCards cc;
 
     private Color veryLightPink = new Color(255, 242, 242);
     private Font smallCalibri = new Font("Calibri", Font.BOLD, 20);
 
-    public LoadDeck(Deck deck) {
+    public LoadDeck(Deck deck, CreateCards cc) {
         this.deck = deck;
+        this.cc = cc;
         displayLoadDeck();
         loadingScreen();
     }
@@ -66,14 +68,15 @@ public class LoadDeck {
 
         in = new JPanel(new MigLayout("align 50% 50%"));
         in.setBackground(LIGHT_PINK);
-        in.setPreferredSize(new Dimension(WIDTH*7/8-5, 775));
+        in.setPreferredSize(new Dimension(WIDTH/2, HEIGHT/2));
         in.setBorder(new CompoundBorder(
                 BorderFactory.createMatteBorder(30, 30, 30, 30, veryLightPink),
                 BorderFactory.createMatteBorder(30, 30, 30, 30, BRIGHT_TURNIPS)));
-        optionsPanel.add(in, "center");
+        optionsPanel.add(in, "center, gapy 90, gapbottom 90");
+
         optionsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        loadDeckPanel.add(optionsPanel, Component.CENTER_ALIGNMENT);
+        loadDeckPanel.add(optionsPanel);
     }
 
 
@@ -92,7 +95,11 @@ public class LoadDeck {
         loaded = new JButton("Loaded");
         loaded.add(Box.createVerticalStrut(100));
         loaded.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loaded.addActionListener(e -> optionsPanel.setVisible(true));
+//        loaded.addActionListener(e -> {
+//
+//            optionsPanel.setVisible(true);
+//                }
+//        );
         makeJOptionButtons(loaded);
         loadingScreen.add(loaded);
         loadDeckPanel.add(loadingScreen, Component.CENTER_ALIGNMENT);
@@ -121,6 +128,8 @@ public class LoadDeck {
 
         confirmStartChoices = new JButton("Confirm");
         makeJOptionButtons(confirmStartChoices);
+
+        // TODO TEMPORARY
         confirmStartChoices.addActionListener(e -> {
             System.out.println("start");
             if (minimalist.isSelected()) {
@@ -142,6 +151,7 @@ public class LoadDeck {
         });
     }
 
+    // effects: makes the checkbox a heart shape, sets font
     private void customizeJCheckBox(JCheckBox cb) {
         ImageIcon imageIcon = new ImageIcon("src/images/blackheart.png");
         Image scaledImg = imageIcon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
@@ -153,13 +163,14 @@ public class LoadDeck {
         cb.setOpaque(false);
     }
 
+    // effects: sets up the layout and spacing of components
     private void createLayout() {
         optionsContainer = new JPanel(new MigLayout("align 50% 50%"));
         optionsContainer.setBackground(veryLightPink);
         optionsContainer.setBorder(new CompoundBorder(
                 BorderFactory.createMatteBorder(30, 30, 30, 30, BRIGHT_PINK),
                 new EmptyBorder(30, 30, 30, 30)));
-        JLabel theme = new JLabel("ThemeSetting");
+        JLabel theme = new JLabel("Theme");
         theme.setFont(CONSOLAS);
         theme.setForeground(BRIGHT_PINK);
 
@@ -187,34 +198,8 @@ public class LoadDeck {
         in.add(optionsContainer, "center");
     }
 
-
-    // getters
-    public JButton getConfirmStartChoices() {
-        return this.confirmStartChoices;
-    }
-
-    public JButton getLoaded() {
-        return this.loaded;
-    }
-
-    public JRadioButton getMinimalist() {
-        return this.minimalist;
-    }
-
-    public JRadioButton getCutesy() {
-        return this.cutesy;
-    }
-
-    public JRadioButton getEdgy() {
-        return this.edgy;
-    }
-
-    public JCheckBox getShuffle() {
-        return this.shuffle;
-    }
-
-    public JCheckBox getStarredOnly() {
-        return this.starredOnly;
+    public JButton getLoadedButton() {
+        return loaded;
     }
 
 }
