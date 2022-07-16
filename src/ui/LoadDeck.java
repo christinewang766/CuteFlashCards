@@ -95,11 +95,6 @@ public class LoadDeck {
         loaded = new JButton("Loaded");
         loaded.add(Box.createVerticalStrut(100));
         loaded.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        loaded.addActionListener(e -> {
-//
-//            optionsPanel.setVisible(true);
-//                }
-//        );
         makeJOptionButtons(loaded);
         loadingScreen.add(loaded);
         loadDeckPanel.add(loadingScreen, Component.CENTER_ALIGNMENT);

@@ -153,7 +153,7 @@ public class MainGUI extends JPanel {
         loaded.addActionListener(e -> {
             cl.show(cards, "create deck");
             create.title.setText(find.getTitle());
-            create.displayCreatedCards();
+            create.displayCreatedCards(deck.getFlashCards());
         });
     }
 

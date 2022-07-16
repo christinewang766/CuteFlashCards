@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
@@ -202,6 +203,10 @@ public class CreateCards {
         startButton.setBorder(BorderFactory.createCompoundBorder(
                 startButton.getBorder(),
                 createEmptyBorder(0, 1200, 0, 0)));
+        // TODO
+        startButton.addActionListener(e -> {
+            saveDeck();
+        });
         createCardsButtonHelper(startButton, "src/images/start.png", 140, 120);
         scrollArea.add(startButton, "south, gapy 70");
     }
@@ -336,18 +341,17 @@ public class CreateCards {
                     "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else if (repeatQuestion()) {
         } else {
-            // TODO EDIT PANEL
             addCard();
-            displayCreatedCards();
+            displayCreatedCards(deck.getFlashCards());
         }
     }
 
     // effects: after passing the other checks, show added cards
-    protected void displayCreatedCards() {
+    protected void displayCreatedCards(ArrayList<Card> cards) {
         clearScrollArea();
         int i;
         i = 0;
-        for (Card card : deck.getFlashCards()) {
+        for (Card card : cards) {
             EditPanel ep = new EditPanel(deck, card, this);
             ep.changeIndex(i);
             scrollArea.add(ep.showCard(),"center, gapy 20");
@@ -440,11 +444,23 @@ public class CreateCards {
 
         @Override
         public void focusGained(FocusEvent e) {
+            if (e.getSource() == title) {
+                title.setBorder(BorderFactory.createLineBorder(BRIGHT_PINK, 5));
+            }
         }
 
         @Override
         public void focusLost(FocusEvent e) {
             if (e.getSource() == title) {
+                Font calItalic = new Font("Calibri", Font.ITALIC, 40);
+                Map attributes = calItalic.getAttributes();
+                attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+
+                RoundJTextArea t = new RoundJTextArea(deck.getTitle());
+                t.setColumns(20);
+                t.setFont(calItalic.deriveFont(attributes));
+                textAreaHelper(title);
+
                 JTextArea titleTextArea = (JTextArea) e.getSource();
                 if (titleTextArea.getText().matches(REGEX_TITLE)) {
                     userTitle = titleTextArea.getText();

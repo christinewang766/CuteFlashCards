@@ -117,7 +117,7 @@ public class FindFile {
             scrollTextPanel.setText(files);
         };
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(run, 0, 3, TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(run, 0, 2, TimeUnit.SECONDS);
     }
 
     // effects: checks if there are any files in the data folder
