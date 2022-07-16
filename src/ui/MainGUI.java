@@ -155,6 +155,7 @@ public class MainGUI extends JPanel {
             create.title.setText(find.getTitle());
             create.displayCreatedCards(find.getFindDeck().getFlashCards());
             create.title.requestFocus();
+            create.setDeck(find.getFindDeck());
         });
     }
 
@@ -166,13 +167,13 @@ public class MainGUI extends JPanel {
                 create.menuWarnUser();
             } else {
                 closeCurrentWindow();
-                create.clearScrollArea();
             }
             cl.first(cards);
             create.title.setText(ENTER_TITLE);
             create.getQuestionArea().setText(TYPE_QUESTION_HERE);
             create.getAnswerArea().setText(TYPE_ANSWER_HERE);
             deck.getFlashCards().clear();
+            create.clearScrollArea();
         });
     }
 }
