@@ -35,6 +35,7 @@ public class MainGUI extends JPanel {
     private Deck deck;
     private FindFile find;
     private Theme theme;
+    private Settings settings;
     private CardLayout cl;
 
     public MainGUI() {
@@ -78,7 +79,7 @@ public class MainGUI extends JPanel {
         displayTitleOptions();
         cards.add(titleOptionsPanel, "create warning");
 
-        create = new CreateCards(deck, frame);
+        create = new CreateCards(deck, frame, cards);
         cards.add(create.createDeckPanel, "create deck");
         // effects: if user creates an empty deck and returns to menu
         // then user goes back to menu with no message
@@ -87,7 +88,6 @@ public class MainGUI extends JPanel {
         // user is taken back to menu and deck in progress vanishes
         backToMenu(true, create.getNopeButton());
 
-
         load = new LoadDeck(deck, create);
         cards.add(load.loadDeckPanel, "loading");
         loadActions();
@@ -95,8 +95,11 @@ public class MainGUI extends JPanel {
         find = new FindFile(deck, frame, load, create, cards);
         cards.add(find.findFilePanel, "find file panel");
 
+        settings = new Settings(deck);
+        cards.add(settings.settingsPanel, "settings");
+
         theme = new Theme();
-        cards.add(theme.themeSettingPanel, "theme setting");
+        cards.add(theme.themeSettingPanel, "theme");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
@@ -173,6 +176,7 @@ public class MainGUI extends JPanel {
             create.getQuestionArea().setText(TYPE_QUESTION_HERE);
             create.getAnswerArea().setText(TYPE_ANSWER_HERE);
             deck.getFlashCards().clear();
+            find.getFindDeck().getFlashCards().clear();
             create.clearScrollArea();
         });
     }

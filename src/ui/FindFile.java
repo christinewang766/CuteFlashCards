@@ -157,7 +157,6 @@ public class FindFile {
         findFileButton.addActionListener(e -> {
             if (loadDeck()) {
                 cl.show(cards, "loading");
-                load.optionsPanel.setVisible(false);
             } else {
                 // credits: Leisurely Pig Line Sticker
                 createNoButtonJOption(create.createDeckPanel, "No deck with that name exists!",
@@ -190,7 +189,6 @@ public class FindFile {
     }
 
     // getters
-
     public String getSource() {
         this.source = "./data/" + textField.getText() + ".json";
         return this.source;

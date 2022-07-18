@@ -39,6 +39,7 @@ public class CreateCards {
     protected JPanel scrollArea;
     private JScrollPane scrollPane;
     private JPanel header;
+    private JPanel cards;
     protected JTextArea title;
     private String userTitle;
     private JButton menuButton;
@@ -47,6 +48,7 @@ public class CreateCards {
     private JButton okay;
     private JButton nope;
     private CuteFocusListener fListen;
+    private CardLayout cl;
 
     private JPanel addCardPanel;
 
@@ -63,11 +65,13 @@ public class CreateCards {
 
     private JsonWriter jsonWriter;
 
-    public CreateCards(Deck deck, JFrame frame) {
+    public CreateCards(Deck deck, JFrame frame, JPanel cards) {
+        this.deck = deck;
         this.frame = frame;
+        this.cards = cards;
+        cl = (CardLayout) (cards.getLayout());
         fListen = new CuteFocusListener();
         userTitle = "";
-        this.deck = deck;
         display();
 
         question = "";
@@ -161,22 +165,30 @@ public class CreateCards {
         saveButton = new JButton("Save");
         makeJOptionButtons(saveButton);
         saveButton.addActionListener(e -> {
-            if (deck.getFlashCards().isEmpty()) {
-                createNoButtonJOption(createDeckPanel, "There's no cards to save!",
-                        "Not to be mean...but...", "src/images/save.png", 100, 100);
-            } else if (userTitle.isEmpty() ||
-                    userTitle == ENTER_TITLE) {
-                createNoButtonJOption(createDeckPanel, "Please choose a new title!",
-                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
-            } else if (!userTitle.matches(REGEX_TITLE)) {
-                createNoButtonJOption(createDeckPanel, "Please make sure that the title only\n"
-                                + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
-                        110, 110);
-            } else {
-                saveDeck();
-            }
+            saveCheck(false);
         });
         header.add(saveButton);
+    }
+
+    // effects: checks if the deck/title satisfies saving criteria
+    private void saveCheck(Boolean closeWindow) {
+        if (deck.getFlashCards().isEmpty()) {
+            createNoButtonJOption(createDeckPanel, "There's no cards to save!",
+                    "Not to be mean...but...", "src/images/save.png", 100, 100);
+        } else if (userTitle.isEmpty() ||
+                userTitle == ENTER_TITLE) {
+            createNoButtonJOption(createDeckPanel, "Please choose a new title!",
+                    "Not to be mean...but...", "src/images/knife.png", 110, 110);
+        } else if (!userTitle.matches(REGEX_TITLE)) {
+            createNoButtonJOption(createDeckPanel, "Please make sure that the title only\n"
+                            + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
+                    110, 110);
+        } else {
+            saveDeck();
+            if (closeWindow) {
+                closeCurrentWindow();
+            }
+        }
     }
 
     // effects: adds a new card to the deck
@@ -205,7 +217,8 @@ public class CreateCards {
                 createEmptyBorder(0, 1200, 0, 0)));
         // TODO
         startButton.addActionListener(e -> {
-            saveDeck();
+            saveCheck(false);
+            cl.show(cards, "settings");
         });
         createCardsButtonHelper(startButton, "src/images/start.png", 140, 120);
         scrollArea.add(startButton, "south, gapy 70");
@@ -284,23 +297,7 @@ public class CreateCards {
 
         okay = new JButton("Okay!");
         makeJOptionButtons(okay);
-        okay.addActionListener(e -> {
-            if (deck.getFlashCards().isEmpty()) {
-                createNoButtonJOption(createDeckPanel, "There's no cards to save!",
-                        "Not to be mean...but...", "src/images/save.png", 100, 100);
-            } else if (userTitle.isEmpty() ||
-                    userTitle == ENTER_TITLE) {
-                createNoButtonJOption(createDeckPanel, "Please choose a new title!",
-                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
-            } else if (!userTitle.matches(REGEX_TITLE)) {
-                createNoButtonJOption(createDeckPanel, "Title may only contain \n"
-                                + "letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
-                        110, 110);
-            } else {
-                saveDeck();
-                closeCurrentWindow();
-            }
-        });
+        okay.addActionListener(e -> saveCheck(true));
         nope = new JButton("Nope.");
         makeJOptionButtons(nope);
     }
