@@ -1,7 +1,5 @@
 package ui;
 
-import model.Deck;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,15 +10,11 @@ import static ui.MainGUI.*;
 
 public class LoadDeck {
 
-    private Deck deck;
     protected JPanel loadDeckPanel;
     protected JPanel loadingScreen;
     private JButton loaded;
-    private CreateCards cc;
 
-    public LoadDeck(Deck deck, CreateCards cc) {
-        this.deck = deck;
-        this.cc = cc;
+    public LoadDeck() {
         displayLoadDeck();
         loadingScreen();
     }

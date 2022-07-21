@@ -1,52 +1,51 @@
 package ui;
 
+import model.Deck;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-
 import java.awt.*;
 
 import static ui.MainGUI.*;
 
-public class Theme {
+public abstract class Theme {
 
-    protected JPanel themeSettingPanel;
-    private JPanel minimalistPanel;
-    private JPanel cutesyPanel;
-    private JPanel edgyPanel;
+    protected JPanel mainPanel;
+    protected JTextArea flashcardPanel;
+    protected JPanel statisticsBar;
+    protected String question;
+    protected String answer;
+    protected Deck deck;
 
-    public Theme() {
-        setUpBasePanel();
-        setUpMinimalistPanel();
-        setUpCutesyPanel();
-        setUpEdgyPanel();
-        minimalistPanel.setVisible(false);
-        cutesyPanel.setVisible(false);
-        edgyPanel.setVisible(false);
+    public Theme(Deck deck) {
+        this.deck = deck;
+        question = "question";
+        answer = "answer";
+        setUpMainPanel();
+        setUpFlashCardPanel();
+        setUpButtons();
+        statistics();
     }
 
-    private void setUpEdgyPanel() {
+    public void setUpMainPanel() {
+        mainPanel = new JPanel();
+        mainPanel.setBackground(LIGHT_PINK);
+        mainPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        mainPanel.setLayout(new MigLayout());
     }
 
-    private void setUpCutesyPanel() {
-        
-    }
+//    protected void setUpBackgroundImage(String source) {
+//        Background background = new Background(source);
+//        mainPanel.add(background);
+//    }
 
-    private void setUpMinimalistPanel() {
-        minimalistPanel.setBackground(Color.white);
-        minimalistPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-    }
+    abstract void setUpFlashCardPanel();
 
-    private void setUpBasePanel() {
-        themeSettingPanel = new JPanel();
-        themeSettingPanel.setBackground(LIGHT_PINK);
-        themeSettingPanel.setLayout(new BoxLayout(themeSettingPanel, BoxLayout.Y_AXIS));
-        minimalistPanel = new JPanel(new MigLayout("align 50% 50%"));
-        cutesyPanel = new JPanel(new MigLayout("align 50% 50%"));
-        edgyPanel = new JPanel(new MigLayout("align 50% 50%"));
-        themeSettingPanel.add(minimalistPanel);
-        themeSettingPanel.add(cutesyPanel);
-        themeSettingPanel.add(edgyPanel);
+    abstract void setUpButtons();
+
+    abstract void statistics();
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
     }
 }

@@ -8,14 +8,13 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,24 +30,15 @@ public class FindFile {
     private CardLayout cl;
     private JPanel cards;
     private CreateCards create;
-    private LoadDeck load;
-    private JFrame frame;
     private Deck deck;
     protected JPanel findFilePanel;
     private JTextArea scrollTextPanel;
     private JScrollPane scrollPane;
     private JTextField textField;
 
-    private JButton findFileButton;
-    private JButton menuButton;
-    private String source;
-    private JsonReader jsonReader;
-
-    public FindFile(Deck deck, JFrame frame, LoadDeck load, CreateCards create, JPanel cards) {
+    public FindFile(Deck deck, CreateCards create, JPanel cards) {
         this.deck = deck;
-        this.load = load;
         this.create = create;
-        this.frame = frame;
         this.cards = cards;
         cl = (CardLayout) (cards.getLayout());
         setUpFindPanel();
@@ -109,7 +99,7 @@ public class FindFile {
             File f = new File("data");
             FilenameFilter filter = (f1, name) -> name.endsWith(".json");
             ArrayList<String> noJson = new ArrayList<>();
-            for (String name : f.list(filter)) {
+            for (String name : Objects.requireNonNull(f.list(filter))) {
                 String noJsonName = name.substring(0, name.lastIndexOf('.'));
                 noJson.add("\u2665 " + noJsonName);
             }
@@ -123,11 +113,7 @@ public class FindFile {
     // effects: checks if there are any files in the data folder
     // that can be loaded
     protected Boolean hasLoadable() {
-        if (scrollTextPanel.getText().length() == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return scrollTextPanel.getText().length() != 0;
     }
 
     // effects: creates the text box to select deck desired as well as
@@ -152,7 +138,7 @@ public class FindFile {
         JLabel nameLabel = new JLabel("File Name:");
         nameLabel.setFont(CALIBRI_BOLD);
         nameLabel.setForeground(BRIGHT_PINK);
-        findFileButton = new JButton("Find");
+        JButton findFileButton = new JButton("Find");
         makeJOptionButtons(findFileButton);
         findFileButton.addActionListener(e -> {
             if (loadDeck()) {
@@ -167,7 +153,7 @@ public class FindFile {
         holdTextComponents.add(nameLabel, "wrap, gapy 15");
         holdTextComponents.add(textField);
         holdTextComponents.add(findFileButton);
-        this.menuButton = createMenuButton();
+        JButton menuButton = createMenuButton();
         menuButton.addActionListener(e -> cl.first(cards));
         holdTextComponents.add(menuButton);
         findFilePanel.add(holdTextComponents);
@@ -178,7 +164,7 @@ public class FindFile {
     // effects: loads the flashcards from file
     private Boolean loadDeck() {
         try {
-            jsonReader = new JsonReader(getSource());
+            JsonReader jsonReader = new JsonReader(getSource());
             deck = jsonReader.read();
             System.out.println("Loaded " + deck.getTitle() + " from " + getSource());
             return true;
@@ -190,8 +176,7 @@ public class FindFile {
 
     // getters
     public String getSource() {
-        this.source = "./data/" + textField.getText() + ".json";
-        return this.source;
+        return "./data/" + textField.getText() + ".json";
     }
 
     public String getTitle() {

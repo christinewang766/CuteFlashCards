@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import static javax.swing.BorderFactory.createEmptyBorder;
 import static model.Card.NUM_ATTEMPTS;
@@ -32,7 +33,6 @@ public class CreateCards {
     public final static String REGEX_TITLE = "[a-zA-Z0-9 ._]*";
     public static final String TYPE_QUESTION_HERE = "Type your question here...\n(" + CHAR_LIMIT + " characters max)";
     public static final String TYPE_ANSWER_HERE = "Type your answer here...\n(" + CHAR_LIMIT + " characters max)";
-    private JFrame frame;
 
     protected JPanel createDeckPanel;
     protected Deck deck;
@@ -43,8 +43,6 @@ public class CreateCards {
     protected JTextArea title;
     private String userTitle;
     private JButton menuButton;
-    private JButton saveButton;
-    private JButton addButton;
     private JButton okay;
     private JButton nope;
     private CuteFocusListener fListen;
@@ -55,7 +53,6 @@ public class CreateCards {
     private JButton confirm;
     private JButton cancel;
     private JButton clear;
-    private JButton startButton;
 
     private String question;
     private String answer;
@@ -65,24 +62,22 @@ public class CreateCards {
 
     private JsonWriter jsonWriter;
 
-    public CreateCards(Deck deck, JFrame frame, JPanel cards) {
+    public CreateCards(Deck deck, JPanel cards) {
         this.deck = deck;
-        this.frame = frame;
         this.cards = cards;
         cl = (CardLayout) (cards.getLayout());
-        fListen = new CuteFocusListener();
         userTitle = "";
-        display();
-
         question = "";
         answer = "";
+        fListen = new CuteFocusListener();
+        display();
         makeCButtons();
         decoratePanel();
     }
 
     // effects: shows the flashcards being made
     protected void display() {
-        createDeckPanel = new JPanel(new FlowLayout((int) Component.CENTER_ALIGNMENT, 40, 40));
+        createDeckPanel = new JPanel(new FlowLayout(0, 40, 40));
         createDeckPanel.setBackground(LIGHT_PINK);
         setUpHeader();
         setUpScrollPane();
@@ -139,10 +134,10 @@ public class CreateCards {
     }
 
     // effects: common code among all three add card buttons
-    private JButton createCardsButtonHelper(JButton button, String source, int width, int height) {
-        ImageIcon imageIcon = new ImageIcon(source);
+    private JButton createCardsButtonHelper(JButton button) {
+        ImageIcon imageIcon = new ImageIcon("src/images/start.png");
         Image image = imageIcon.getImage();
-        Image newImg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+        Image newImg = image.getScaledInstance(140, 120, java.awt.Image.SCALE_SMOOTH);
         imageIcon = new ImageIcon(newImg);
         button.setIcon(imageIcon);
         button.setFont(CALIBRI_BOLD);
@@ -162,7 +157,7 @@ public class CreateCards {
 
     // effects: constructs a button to save the deck of flashcards
     private void saveButton() {
-        saveButton = new JButton("Save");
+        JButton saveButton = new JButton("Save");
         makeJOptionButtons(saveButton);
         saveButton.addActionListener(e -> {
             saveCheck(false);
@@ -193,7 +188,7 @@ public class CreateCards {
 
     // effects: adds a new card to the deck
     private void createCard() {
-        addButton = new JButton("Add Card");
+        JButton addButton = new JButton("Add Card");
         makeJOptionButtons(addButton);
         addButton.addActionListener(e -> {
             if (userTitle.equals(ENTER_TITLE) || userTitle.equals("")) {
@@ -211,7 +206,7 @@ public class CreateCards {
     // effects: opens up the options to start studying
     // includes theme, shuffle, starred only
     private void startButton() {
-        startButton = new JButton("Start");
+        JButton startButton = new JButton("Start");
         startButton.setBorder(BorderFactory.createCompoundBorder(
                 startButton.getBorder(),
                 createEmptyBorder(0, 1200, 0, 0)));
@@ -220,7 +215,7 @@ public class CreateCards {
             saveCheck(false);
             cl.show(cards, "settings");
         });
-        createCardsButtonHelper(startButton, "src/images/start.png", 140, 120);
+        createCardsButtonHelper(startButton);
         scrollArea.add(startButton, "south, gapy 70");
     }
 
@@ -231,7 +226,7 @@ public class CreateCards {
         if (!deck.getFlashCards().isEmpty()) {
             File f = new File("data");
             FilenameFilter filter = (f1, name) -> name.equals(userTitle + ".json");
-            if (f.list(filter).length > 0) {
+            if (Objects.requireNonNull(f.list(filter)).length > 0) {
                 JOptionPane.showOptionDialog(createDeckPanel, "Save and overwrite a file?",
                         "Menu Warning",
                         JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
@@ -337,6 +332,8 @@ public class CreateCards {
             createNoButtonJOption(addCardPanel, "You may not have empty questions or answers.",
                     "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else if (repeatQuestion()) {
+            createNoButtonJOption(addCardPanel, "Another card already has the same question!",
+                    "Not to be mean...but...", "src/images/knife.png", 110, 110);
         } else {
             addCard();
             displayCreatedCards(deck.getFlashCards());
@@ -370,8 +367,6 @@ public class CreateCards {
     private Boolean repeatQuestion() {
         for (Card card : deck.getCards()) {
             if (card.getQuestion().equals(questionArea.getText())) {
-                createNoButtonJOption(addCardPanel, "Another card already has the same question!",
-                        "Not to be mean...but...", "src/images/knife.png", 110, 110);
                 return true;
             }
         }

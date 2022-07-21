@@ -1,12 +1,9 @@
 package ui;
 import model.Deck;
-import model.JsonReader;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +31,6 @@ public class MainGUI extends JPanel {
     private CreateCards create;
     private Deck deck;
     private FindFile find;
-    private Theme theme;
-    private Settings settings;
     private CardLayout cl;
 
     public MainGUI() {
@@ -76,30 +71,32 @@ public class MainGUI extends JPanel {
         //Create the panel that contains the "cards".
         cards = new JPanel(new CardLayout());
         cl = (CardLayout) (cards.getLayout());
-        displayTitleOptions();
-        cards.add(titleOptionsPanel, "create warning");
+        // TODO uncomment displayTitleOptions()
+//        displayTitleOptions();
 
-        create = new CreateCards(deck, frame, cards);
-        cards.add(create.createDeckPanel, "create deck");
-        // effects: if user creates an empty deck and returns to menu
-        // then user goes back to menu with no message
-        backToMenu(false, create.getMenuButton());
-        // effects: if user creates a deck and refuses to save then
-        // user is taken back to menu and deck in progress vanishes
-        backToMenu(true, create.getNopeButton());
+//        cards.add(titleOptionsPanel, "create warning");
+//
+//        create = new CreateCards(deck, cards);
+//        cards.add(create.createDeckPanel, "create deck");
+//        // effects: if user creates an empty deck and returns to menu
+//        // then user goes back to menu with no message
+//        backToMenu(false, create.getMenuButton());
+//        // effects: if user creates a deck and refuses to save then
+//        // user is taken back to menu and deck in progress vanishes
+//        backToMenu(true, create.getNopeButton());
+//
+//        load = new LoadDeck();
+//        cards.add(load.loadDeckPanel, "loading");
+//        loadActions();
+//
+//        find = new FindFile(deck, create, cards);
+//        cards.add(find.findFilePanel, "find file panel");
+//
+//        Settings settings = new Settings(deck);
+//        cards.add(settings.settingsPanel, "settings");
 
-        load = new LoadDeck(deck, create);
-        cards.add(load.loadDeckPanel, "loading");
-        loadActions();
-
-        find = new FindFile(deck, frame, load, create, cards);
-        cards.add(find.findFilePanel, "find file panel");
-
-        settings = new Settings(deck);
-        cards.add(settings.settingsPanel, "settings");
-
-        theme = new Theme();
-        cards.add(theme.themeSettingPanel, "theme");
+        Minimalist minimalist = new Minimalist(deck);
+        cards.add(minimalist.mainPanel, "minimalist");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
@@ -164,8 +161,7 @@ public class MainGUI extends JPanel {
 
     // effects: brings user back to menu, may close previous option window
     private void backToMenu(Boolean closeWindow, JButton button) {
-        JButton b = button;
-        b.addActionListener(e -> {
+        button.addActionListener(e -> {
             if (!closeWindow) {
                 create.menuWarnUser();
             } else {

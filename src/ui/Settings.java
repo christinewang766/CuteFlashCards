@@ -19,7 +19,6 @@ public class Settings {
     protected JPanel optionsContainer;
     protected JPanel settingsPanel;
 
-    private ButtonGroup group;
     private JRadioButton minimalist;
     private JRadioButton cutesy;
     private JRadioButton edgy;
@@ -28,8 +27,8 @@ public class Settings {
     private JButton confirmStartChoices;
     private JPanel in;
 
-    private Color veryLightPink = new Color(255, 242, 242);
-    private Font smallCalibri = new Font("Calibri", Font.BOLD, 20);
+    private final Color veryLightPink = new Color(255, 242, 242);
+    private final Font smallCalibri = new Font("Calibri", Font.BOLD, 20);
 
     public Settings(Deck deck) {
         this.deck = deck;
@@ -64,7 +63,7 @@ public class Settings {
 
     private void createButtons() {
 
-        group = new ButtonGroup();
+        ButtonGroup group = new ButtonGroup();
         minimalist = new JRadioButton("Minimalist", true);
         minimalist.setFont(smallCalibri);
         minimalist.setOpaque(false);
@@ -127,7 +126,7 @@ public class Settings {
         optionsContainer.setBorder(new CompoundBorder(
                 BorderFactory.createMatteBorder(30, 30, 30, 30, BRIGHT_PINK),
                 new EmptyBorder(30, 30, 30, 30)));
-        JLabel theme = new JLabel("Theme");
+        JLabel theme = new JLabel("temp");
         theme.setFont(CONSOLAS);
         theme.setForeground(BRIGHT_PINK);
 

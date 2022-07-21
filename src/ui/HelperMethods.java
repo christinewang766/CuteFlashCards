@@ -59,9 +59,9 @@ public class HelperMethods {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        assert img != null;
         Image scaledImg = img.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-        ImageIcon icon = new ImageIcon(scaledImg);
-        return icon;
+        return new ImageIcon(scaledImg);
     }
 
     // effects: makes a JOptionPane without a button to warn user
@@ -75,9 +75,8 @@ public class HelperMethods {
 
     // effects: changes the background of JOption and other UI panels
     public static void frameChanges() {
-        UIManager frameChanges = new UIManager();
-        frameChanges.put("OptionPane.background",LIGHT_PINK);
-        frameChanges.put("Panel.background",LIGHT_PINK);
+        UIManager.put("OptionPane.background",LIGHT_PINK);
+        UIManager.put("Panel.background",LIGHT_PINK);
         UIManager.put("OptionPane.messageFont", new Font("Consolas", Font.BOLD, 25));
         UIManager.put("OptionPane.buttonFont", CALIBRI_BOLD);
     }
@@ -104,7 +103,8 @@ public class HelperMethods {
         Image scaledImg = image.getScaledInstance(WIDTH, HEIGHT, java.awt.Image.SCALE_SMOOTH);
 
         // credit: https://coderanch.com/t/700884/java/static-background-scrollpane
-        JViewport viewport = new JViewport() {
+
+        return new JViewport() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -112,8 +112,6 @@ public class HelperMethods {
                 g.drawImage(scaledImg, 0, 0, getWidth(), getHeight(), this);
             }
         };
-
-        return viewport;
     }
 
     // effects: brings you back to the main title page,

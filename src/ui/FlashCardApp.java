@@ -2,13 +2,12 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileNotFoundException;
 
 import static ui.MainGUI.BRIGHT_PINK;
 
 public class FlashCardApp {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         // credits: https://stackoverflow.com/questions/2482971/how-to-change-the-color-of-titlebar-in-jframe
         UIDefaults uiDefaults = UIManager.getDefaults();
         uiDefaults.put("activeCaption", new javax.swing.plaf.ColorUIResource(BRIGHT_PINK));
