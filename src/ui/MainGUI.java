@@ -1,5 +1,6 @@
 package ui;
 import model.Deck;
+import model.JsonReader;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,6 +36,14 @@ public class MainGUI extends JPanel {
 
     public MainGUI() {
         deck = new Deck(ENTER_TITLE);
+        // TODO delete after!!!
+        try {
+            JsonReader jsonReader = new JsonReader("./data/steven.json");
+            deck = jsonReader.read();
+            System.out.println("Loaded " + deck.getTitle() + " from ./data/steven.json");
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: ./data/steven.json");
+        }
         makeFrame();
         layers();
         frame.pack();

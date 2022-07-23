@@ -12,83 +12,83 @@ public class DeckTest {
     private Card test1;
     private Card test2;
     private Card test3;
-    private Deck cards;
+    private Deck deck;
 
 
     @BeforeEach
     public void runBefore() {
-        cards = new Deck("Tester Title");
+        deck = new Deck("Tester Title");
         test1 = new Card("a", "b", false, false, Card.NUM_ATTEMPTS, true);
         test2 = new Card("c", "d", false, false, Card.NUM_ATTEMPTS, true);
         test3 = new Card("e", "f", false, false, Card.NUM_ATTEMPTS, true);
-        cards.getFlashCards().add(test1);
-        cards.getFlashCards().add(test2);
-        cards.getFlashCards().add(test3);
+        deck.getFlashCards().add(test1);
+        deck.getFlashCards().add(test2);
+        deck.getFlashCards().add(test3);
     }
 
     @Test
     public void testConstructor() {
-        assertNull(cards.getCurrentCard());
-        assertEquals(3, cards.getFlashCards().size());
-        assertEquals(0, cards.getCompletedFlashCards().size());
+        assertNull(deck.getCurrentCard());
+        assertEquals(3, deck.getFlashCards().size());
+        assertEquals(0, deck.getCompletedFlashCards().size());
     }
 
     @Test
     public void testGetNextCard() {
-        assertTrue(cards.hasMoreCards());
-        assertEquals(test1, cards.getNextCard());
-        assertEquals(test2, cards.getNextCard());
-        assertEquals(test3, cards.getNextCard());
-        assertFalse(cards.hasMoreCards());
+        assertTrue(deck.hasMoreCards());
+        assertEquals(test1, deck.getNextCard());
+        assertEquals(test2, deck.getNextCard());
+        assertEquals(test3, deck.getNextCard());
+        assertFalse(deck.hasMoreCards());
     }
 
     @Test
     public void testCheckAnswer() {
-        cards.getNextCard();
-        assertFalse(cards.checkAnswer("a"));
-        assertTrue(cards.checkAnswer("B"));
-        assertTrue(cards.checkAnswer("b"));
-        assertFalse(cards.checkAnswer("d"));
+        deck.getNextCard();
+        assertFalse(deck.checkAnswer("a"));
+        assertTrue(deck.checkAnswer("B"));
+        assertTrue(deck.checkAnswer("b"));
+        assertFalse(deck.checkAnswer("d"));
 
-        cards.getNextCard();
-        assertFalse(cards.checkAnswer("c"));
-        assertTrue(cards.checkAnswer("D"));
-        assertTrue(cards.checkAnswer("d"));
-        assertFalse(cards.checkAnswer("C"));
+        deck.getNextCard();
+        assertFalse(deck.checkAnswer("c"));
+        assertTrue(deck.checkAnswer("D"));
+        assertTrue(deck.checkAnswer("d"));
+        assertFalse(deck.checkAnswer("C"));
     }
 
     @Test
     public void testSubmitAnswer() {
-        cards.getNextCard();
-        assertTrue(cards.getCurrentCard().getFirstGuess());
-        assertEquals("Wrong!", cards.submitAnswer("d"));
-        assertEquals(2, cards.getCurrentCard().getAttempts());
-        assertFalse(cards.getCurrentCard().getFirstGuess());
+        deck.getNextCard();
+        assertTrue(deck.getCurrentCard().getFirstGuess());
+        assertEquals("Wrong!", deck.submitAnswer("d"));
+        assertEquals(2, deck.getCurrentCard().getAttempts());
+        assertFalse(deck.getCurrentCard().getFirstGuess());
 
-        cards.getNextCard();
-        assertTrue(cards.getCurrentCard().getFirstGuess());
-        assertEquals("Correct!", cards.submitAnswer("d"));
-        assertTrue(cards.getCurrentCard().getFirstGuess());
-        cards.getNextCard();
-        assertTrue(cards.getCurrentCard().getFirstGuess());
-        assertEquals("Correct!", cards.submitAnswer("f"));
-        assertTrue(cards.getCurrentCard().getFirstGuess());
+        deck.getNextCard();
+        assertTrue(deck.getCurrentCard().getFirstGuess());
+        assertEquals("Correct!", deck.submitAnswer("d"));
+        assertTrue(deck.getCurrentCard().getFirstGuess());
+        deck.getNextCard();
+        assertTrue(deck.getCurrentCard().getFirstGuess());
+        assertEquals("Correct!", deck.submitAnswer("f"));
+        assertTrue(deck.getCurrentCard().getFirstGuess());
 
-        cards.getNextCard();
-        assertFalse(cards.getCurrentCard().getFirstGuess());
-        assertEquals("Correct!", cards.submitAnswer("b"));
-        assertEquals(1, cards.getCurrentCard().getAttempts());
-        assertEquals("Correct!", cards.submitAnswer("b"));
-        assertEquals(0, cards.getCurrentCard().getAttempts());
-        assertFalse(cards.hasMoreCards());
+        deck.getNextCard();
+        assertFalse(deck.getCurrentCard().getFirstGuess());
+        assertEquals("Correct!", deck.submitAnswer("b"));
+        assertEquals(1, deck.getCurrentCard().getAttempts());
+        assertEquals("Correct!", deck.submitAnswer("b"));
+        assertEquals(0, deck.getCurrentCard().getAttempts());
+        assertFalse(deck.hasMoreCards());
 
         // only 2/3 cards were guessed right on the first run through
-        assertEquals(2, cards.countCorrect());
+        assertEquals(2, deck.countCorrect());
 
 
         String message = "You answered 2/3 flashcards correctly on the first try.\n"
                 + "Your score is 66.7%.";
-        assertEquals(message, cards.summary());
+        assertEquals(message, deck.summary());
     }
 
     @Test

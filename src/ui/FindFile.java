@@ -162,7 +162,7 @@ public class FindFile {
     // effects: loads up the previously made flashcards
     // inspired by JsonSerializationDemo
     // effects: loads the flashcards from file
-    private Boolean loadDeck() {
+    protected Boolean loadDeck() {
         try {
             JsonReader jsonReader = new JsonReader(getSource());
             deck = jsonReader.read();

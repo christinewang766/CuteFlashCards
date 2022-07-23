@@ -47,11 +47,8 @@ public class Deck implements Writable {
     // modifies: this
     // effects: checks the answer to the current card
     public boolean checkAnswer(String answer) {
-        if (this.currentCard.getAnswer().equalsIgnoreCase(answer)
-                && !this.currentCard.getComplete()) {
-            return true;
-        }
-        return false;
+        return this.currentCard.getAnswer().equalsIgnoreCase(answer)
+                && !this.currentCard.getComplete();
     }
 
     // requires: card should be in flashCards
@@ -59,13 +56,14 @@ public class Deck implements Writable {
     // up or down depending on correctness of answer and if user
     // should repeat the card again
     public String submitAnswer(String answer) {
-        if (checkAnswer(answer) ) {
+        if (checkAnswer(answer)) {
             int attempts = this.currentCard.getAttempts();
             if (attempts == 1 || this.currentCard.getFirstGuess()) {
                 this.currentCard.setComplete(true);
                 this.completedFlashCards.add(this.currentCard);
             }
             this.currentCard.setAttempts(attempts - 1);
+            System.out.println("Correct!");
             return ("Correct!");
         } else {
             // adds card to the back of the list
@@ -74,14 +72,9 @@ public class Deck implements Writable {
                     this.currentCard.getStarred(), NUM_ATTEMPTS, this.currentCard.getFirstGuess());
             wrongCard.setFirstGuess(false);
             addFlashCard(wrongCard);
+            System.out.println("Wrong!");
             return ("Wrong!");
         }
-    }
-
-    // effects: deletes the cards marked complete from flashcards
-    private ArrayList<Card> getUnfinishedFlashcards() {
-        deleteAllPrevious();
-        return this.flashCards;
     }
 
     // effects: shuffles the deck
@@ -119,6 +112,10 @@ public class Deck implements Writable {
         DecimalFormat oneDecimal = new DecimalFormat("#.#");
 
         double percentageCorrect = 100 * (double) this.countCorrect() / (double) this.completedFlashCards.size();
+
+        System.out.println("You answered " + this.countCorrect() + "/" + this.completedFlashCards.size()
+                + " flashcards correctly on the first try.\n"
+                + "Your score is " + oneDecimal.format(percentageCorrect) + "%.");
 
         return "You answered " + this.countCorrect() + "/" + this.completedFlashCards.size()
                 + " flashcards correctly on the first try.\n"
@@ -207,14 +204,10 @@ public class Deck implements Writable {
 
     // getters
 
-    // effects: returns an unmodifiable list of flashcards in this deck
-    public List<Card> getUnmodFlashCards() {
-        return Collections.unmodifiableList(this.flashCards);
-    }
-
-    // effects: returns an unmodifiable list of completed cards in this deck
-    public List<Card> getUnmodCompletedCards() {
-        return Collections.unmodifiableList(this.completedFlashCards);
+    // effects: deletes the cards marked complete from flashcards
+    public ArrayList<Card> getUnfinishedFlashcards() {
+        deleteAllPrevious();
+        return this.flashCards;
     }
 
     public ArrayList<Card> getFlashCards() {
