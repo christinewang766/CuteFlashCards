@@ -60,26 +60,49 @@ public class DeckTest {
     @Test
     public void testSubmitAnswer() {
         deck.getNextCard();
+        // question = a, answer = b
         assertTrue(deck.getCurrentCard().getFirstGuess());
         assertEquals("Wrong!", deck.submitAnswer("d"));
-        assertEquals(2, deck.getCurrentCard().getAttempts());
+        assertEquals(3, deck.getCurrentCard().getAttempts());
         assertFalse(deck.getCurrentCard().getFirstGuess());
+        // list is :
+//        question = c, answer = d, 3 tries
+//        question = e, answer = f, 3 tries
+//        question = a, answer = b, 3 tries
+
 
         deck.getNextCard();
+        // question = c, answer = d
         assertTrue(deck.getCurrentCard().getFirstGuess());
         assertEquals("Correct!", deck.submitAnswer("d"));
         assertTrue(deck.getCurrentCard().getFirstGuess());
+        // list is :
+//        question = e, answer = f, 3 tries
+//        question = a, answer = b, 3 tries
+
         deck.getNextCard();
+        // question = e, answer = f
         assertTrue(deck.getCurrentCard().getFirstGuess());
         assertEquals("Correct!", deck.submitAnswer("f"));
         assertTrue(deck.getCurrentCard().getFirstGuess());
+        // list is :
+//        question = a, answer = b, 3 tries
 
         deck.getNextCard();
+        // question = a, answer = b, 3 tries
         assertFalse(deck.getCurrentCard().getFirstGuess());
-        assertEquals("Correct!", deck.submitAnswer("b"));
+        assertEquals("Correct! but not first guess. Try again!", deck.submitAnswer("b"));
+
+        deck.getNextCard();
+        // question = a, answer = b, 2 tries
+        assertFalse(deck.getCurrentCard().getFirstGuess());
+        assertEquals(2, deck.getCurrentCard().getAttempts());
+        assertEquals("Correct! but not first guess. Try again!", deck.submitAnswer("b"));
+        deck.getNextCard();
+        // question = a, answer = b, 1 tries
+        assertFalse(deck.getCurrentCard().getFirstGuess());
         assertEquals(1, deck.getCurrentCard().getAttempts());
         assertEquals("Correct!", deck.submitAnswer("b"));
-        assertEquals(0, deck.getCurrentCard().getAttempts());
         assertFalse(deck.hasMoreCards());
 
         // only 2/3 cards were guessed right on the first run through
@@ -94,6 +117,5 @@ public class DeckTest {
     @Test
     public void testReset() {
         testSubmitAnswer();
-
     }
 }

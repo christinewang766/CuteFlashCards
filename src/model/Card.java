@@ -13,7 +13,7 @@ public class Card implements Writable {
     private Boolean starred;
     private int attempts;
 
-    public static final int NUM_ATTEMPTS = 2;
+    public static final int NUM_ATTEMPTS = 3;
 
     public Card(String question, String answer, Boolean complete, Boolean starred, int attempts, Boolean firstGuess) {
         this.attempts = attempts;
@@ -22,15 +22,6 @@ public class Card implements Writable {
         this.starred = starred;
         this.complete = complete;
         this.firstGuess = firstGuess;
-        init();
-    }
-
-    // effects: initiate new card values
-    private void init() {
-        this.attempts = NUM_ATTEMPTS;
-        this.starred = false;
-        this.complete = false;
-        this.firstGuess = true;
     }
 
     @Override

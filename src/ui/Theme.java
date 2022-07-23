@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.DecimalFormat;
+
 import static ui.MainGUI.*;
 
 public abstract class Theme {
@@ -41,7 +43,7 @@ public abstract class Theme {
             deck.getNextCard();
             flashcardPanel.setText(deck.getCurrentCard().getQuestion());
         } else {
-            deck.summary();
+            flashcardPanel.setText(deck.summary());
         }
     }
 
@@ -88,14 +90,17 @@ public abstract class Theme {
     }
 
     private void statistics() {
+
+        DecimalFormat oneDecimal = new DecimalFormat("#.#");
+        double percentageCorrect = 100 * (double) deck.countCorrect() / (double) deck.getCompletedFlashCards().size();
+
         cardsLeft = new JLabel("Cards Left: " + deck.getUnfinishedFlashcards().size());
 
-        double num = 100 * (double) deck.countCorrect() / (double) deck.getCompletedFlashCards().size();
 
         if ((double) deck.getCompletedFlashCards().size() == 0) {
             percentAccuracy = new JLabel("Accuracy: 0%");
         } else {
-            percentAccuracy = new JLabel("Accuracy: " + num + "%");
+            percentAccuracy = new JLabel("Accuracy: " + oneDecimal.format(percentageCorrect) + "%");
         }
     }
 

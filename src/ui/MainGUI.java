@@ -38,11 +38,11 @@ public class MainGUI extends JPanel {
         deck = new Deck(ENTER_TITLE);
         // TODO delete after!!!
         try {
-            JsonReader jsonReader = new JsonReader("./data/steven.json");
+            JsonReader jsonReader = new JsonReader("./data/howdy.json");
             deck = jsonReader.read();
-            System.out.println("Loaded " + deck.getTitle() + " from ./data/steven.json");
+            System.out.println("Loaded " + deck.getTitle() + " from ./data/howdy.json");
         } catch (IOException e) {
-            System.out.println("Unable to read from file: ./data/steven.json");
+            System.out.println("Unable to read from file: ./data/howdy.json");
         }
         makeFrame();
         layers();

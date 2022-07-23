@@ -57,20 +57,24 @@ public class Deck implements Writable {
     // should repeat the card again
     public String submitAnswer(String answer) {
         if (checkAnswer(answer)) {
-            int attempts = this.currentCard.getAttempts();
-            if (attempts == 1 || this.currentCard.getFirstGuess()) {
+            if ((this.currentCard.getAttempts() == 1) || (this.currentCard.getFirstGuess())) {
                 this.currentCard.setComplete(true);
                 this.completedFlashCards.add(this.currentCard);
+                System.out.println("Correct!");
+                return ("Correct!");
+            } else {
+                this.currentCard.setFirstGuess(false);
+                Card tryAgain = new Card(this.currentCard.getQuestion(), this.currentCard.getAnswer(), false,
+                        this.currentCard.getStarred(), this.currentCard.getAttempts()-1, false);
+                addFlashCard(tryAgain);
+                System.out.println("Correct! but not first guess. Try again!");
+                return ("Correct! but not first guess. Try again!");
             }
-            this.currentCard.setAttempts(attempts - 1);
-            System.out.println("Correct!");
-            return ("Correct!");
         } else {
             // adds card to the back of the list
             this.currentCard.setFirstGuess(false);
             Card wrongCard = new Card(this.currentCard.getQuestion(), this.currentCard.getAnswer(), false,
-                    this.currentCard.getStarred(), NUM_ATTEMPTS, this.currentCard.getFirstGuess());
-            wrongCard.setFirstGuess(false);
+                    this.currentCard.getStarred(), NUM_ATTEMPTS, false);
             addFlashCard(wrongCard);
             System.out.println("Wrong!");
             return ("Wrong!");

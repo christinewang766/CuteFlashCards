@@ -25,7 +25,7 @@ public class CardTest {
         assertEquals("b", test1.getAnswer());
         assertFalse(test1.getComplete());
         assertTrue(test1.getFirstGuess());
-        assertEquals(2, test1.getAttempts());
+        assertEquals(3, test1.getAttempts());
         assertFalse(test1.getStarred());
 
         assertEquals("c", test2.getQuestion());
