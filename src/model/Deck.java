@@ -114,7 +114,6 @@ public class Deck implements Writable {
     // effects: summary of user's accuracy
     public String summary() {
         DecimalFormat oneDecimal = new DecimalFormat("#.#");
-
         double percentageCorrect = 100 * (double) this.countCorrect() / (double) this.completedFlashCards.size();
 
         System.out.println("You answered " + this.countCorrect() + "/" + this.completedFlashCards.size()
@@ -212,6 +211,19 @@ public class Deck implements Writable {
     public ArrayList<Card> getUnfinishedFlashcards() {
         deleteAllPrevious();
         return this.flashCards;
+    }
+
+    public int getCountOfUnfinishedFlashcards() {
+        ArrayList<Card> copy = new ArrayList<>();
+        for (Card card : this.flashCards) {
+            copy.add(card);
+        }
+        int indexBookMark = copy.indexOf(this.currentCard);
+        for(int i = 0; i < indexBookMark; i++) {
+            copy.remove(0);
+        }
+
+        return copy.size();
     }
 
     public ArrayList<Card> getFlashCards() {

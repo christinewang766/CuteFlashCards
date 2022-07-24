@@ -25,6 +25,8 @@ public abstract class Theme {
     protected JButton star;
     protected JLabel cardsLeft;
     protected JLabel percentAccuracy;
+    private DecimalFormat oneDecimal;
+    private double percentageCorrect;
 
     public Theme(Deck deck) {
         this.deck = deck;
@@ -55,6 +57,8 @@ public abstract class Theme {
         star = new JButton("Star");
         edit = new JButton("Edit");
         statisticsBar = new JPanel(new MigLayout());
+        oneDecimal = new DecimalFormat("#.#");
+        percentageCorrect = 100 * (double) deck.countCorrect() / (double) deck.getCompletedFlashCards().size();
     }
 
     private void setUpMainPanel() {
@@ -84,18 +88,17 @@ public abstract class Theme {
                     answerField.setText("");
                     deck.submitAnswer(getAnswer());
                     setUpFlashcardPanel();
+                    cardsLeft.setText("Cards Left: " + deck.getCountOfUnfinishedFlashcards());
+                    percentAccuracy.setText("Accuracy: " + oneDecimal.format(percentageCorrect) + "%");
                 }
             }
         });
     }
 
+    // effects: calculates how many cards are left to do and the
+    // accuracy of the user; creates JLabel for both
     private void statistics() {
-
-        DecimalFormat oneDecimal = new DecimalFormat("#.#");
-        double percentageCorrect = 100 * (double) deck.countCorrect() / (double) deck.getCompletedFlashCards().size();
-
         cardsLeft = new JLabel("Cards Left: " + deck.getUnfinishedFlashcards().size());
-
 
         if ((double) deck.getCompletedFlashCards().size() == 0) {
             percentAccuracy = new JLabel("Accuracy: 0%");

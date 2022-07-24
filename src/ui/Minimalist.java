@@ -75,7 +75,6 @@ public class Minimalist extends Theme {
         percentAccuracy.setFont(new Font("Calibri", Font.BOLD, 25));
         percentAccuracy.setForeground(sageGreen);
         statisticsBar.add(percentAccuracy);
-
     }
 
     private void buttonPanelBar() {
