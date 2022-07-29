@@ -31,7 +31,6 @@ public class HelperMethods {
         text.setBorder(BorderFactory.createCompoundBorder(
                 text.getBorder(),
                 createEmptyBorder(15, 15, 15, 15)));
-        text.setLineWrap(true);
         text.setWrapStyleWord(true);
     }
 

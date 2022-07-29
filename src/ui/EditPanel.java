@@ -43,10 +43,10 @@ public class EditPanel {
 
         questionCardArea = new JTextArea(card.getQuestion());
         questionCardArea.setBorder(new EmptyBorder(10, 10, 10, 10));
-        questionCardArea.setLineWrap(true);
+        questionCardArea.setWrapStyleWord(true);
         answerCardArea = new JTextArea(card.getAnswer());
         answerCardArea.setBorder(new EmptyBorder(10, 10, 10, 10));
-        answerCardArea.setLineWrap(true);
+        answerCardArea.setWrapStyleWord(true);
 
         JScrollPane question = new JScrollPane(questionCardArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

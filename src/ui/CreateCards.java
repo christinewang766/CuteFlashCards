@@ -35,21 +35,21 @@ public class CreateCards {
     public static final String TYPE_ANSWER_HERE = "Type your answer here...\n(" + CHAR_LIMIT + " characters max)";
 
     protected JPanel createDeckPanel;
-    protected Deck deck;
-    protected JPanel scrollArea;
-    private JScrollPane scrollPane;
+    private JPanel addCardPanel;
     private JPanel header;
     private JPanel cards;
+    protected JPanel scrollArea;
+    protected Deck deck;
+    private JScrollPane scrollPane;
     protected JTextArea title;
     private String userTitle;
-    private JButton menuButton;
-    private JButton okay;
-    private JButton nope;
+
     private CuteFocusListener fListen;
     private CardLayout cl;
 
-    private JPanel addCardPanel;
-
+    private JButton menuButton;
+    private JButton okay;
+    private JButton nope;
     private JButton confirm;
     private JButton cancel;
     private JButton clear;
@@ -134,7 +134,7 @@ public class CreateCards {
     }
 
     // effects: common code among all three add card buttons
-    private JButton createCardsButtonHelper(JButton button) {
+    private void createCardsButtonHelper(JButton button) {
         ImageIcon imageIcon = new ImageIcon("src/images/start.png");
         Image image = imageIcon.getImage();
         Image newImg = image.getScaledInstance(140, 120, java.awt.Image.SCALE_SMOOTH);
@@ -142,7 +142,6 @@ public class CreateCards {
         button.setIcon(imageIcon);
         button.setFont(CALIBRI_BOLD);
         buttonHelper(button);
-        return button;
     }
 
     // effects: brings you back to the main title page,
@@ -179,7 +178,7 @@ public class CreateCards {
                             + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
                     110, 110);
         } else {
-            saveDeck();
+            saveDeck(userTitle);
             if (closeWindow) {
                 closeCurrentWindow();
             }
@@ -393,7 +392,7 @@ public class CreateCards {
 
     // credits: JsonSerializationDemo CPSC 210
     // effects: saves the new deck of flashcards to file
-    protected void saveDeck() {
+    protected void saveDeck(String userTitle) {
         String source = "./data/" + userTitle + ".json";
 
         try {
@@ -414,14 +413,6 @@ public class CreateCards {
         } catch (FileNotFoundException e) {
             System.out.println("Unable to write to file: " + source);
         }
-    }
-
-    public JButton getNopeButton() {
-        return this.nope;
-    }
-
-    public JButton getMenuButton() {
-        return this.menuButton;
     }
 
     public RoundJTextArea getQuestionArea() {

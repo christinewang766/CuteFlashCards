@@ -16,6 +16,7 @@ import static ui.MainGUI.BRIGHT_TURNIPS;
 public class Settings {
 
     private Deck deck;
+    private CreateCards cc;
     protected JPanel optionsContainer;
     protected JPanel settingsPanel;
 
@@ -30,8 +31,9 @@ public class Settings {
     private final Color veryLightPink = new Color(255, 242, 242);
     private final Font smallCalibri = new Font("Calibri", Font.BOLD, 20);
 
-    public Settings(Deck deck) {
+    public Settings(Deck deck, CreateCards cc) {
         this.deck = deck;
+        this.cc = cc;
         optionsPanel();
         createButtons();
         createLayout();
@@ -88,13 +90,8 @@ public class Settings {
         // TODO TEMPORARY
         confirmStartChoices.addActionListener(e -> {
             System.out.println("start");
-            if (minimalist.isSelected()) {
-                System.out.println("minimalist");
-            } if (cutesy.isSelected()) {
-                System.out.println("cutesey");
-            } if (edgy.isSelected()) {
-                System.out.println("edgy");
-            } if (shuffle.isSelected()) {
+            deck.setCards(deck.getFlashCards());
+            if (shuffle.isSelected()) {
                 if (starredOnly.isSelected()) {
                     deck.setFlashCards(deck.starredOnly());
                     deck.shuffle(deck.getFlashCards());
@@ -103,6 +100,16 @@ public class Settings {
                 }
             } if (starredOnly.isSelected() && !shuffle.isSelected()) {
                 deck.setFlashCards(deck.starredOnly());
+            }
+            if (minimalist.isSelected()) {
+                Minimalist min = new Minimalist(deck, cc);
+                System.out.println("minimalist");
+            } if (cutesy.isSelected()) {
+                Minimalist min = new Minimalist(deck, cc);
+                System.out.println("cutesey");
+            } if (edgy.isSelected()) {
+                Minimalist min = new Minimalist(deck, cc);
+                System.out.println("edgy");
             }
         });
     }

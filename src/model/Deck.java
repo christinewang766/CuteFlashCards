@@ -214,16 +214,18 @@ public class Deck implements Writable {
     }
 
     public int getCountOfUnfinishedFlashcards() {
+        int i = 1;
         ArrayList<Card> copy = new ArrayList<>();
         for (Card card : this.flashCards) {
             copy.add(card);
         }
         int indexBookMark = copy.indexOf(this.currentCard);
-        for(int i = 0; i < indexBookMark; i++) {
-            copy.remove(0);
+        for (Card card : copy) {
+            if (copy.indexOf(card) > indexBookMark) {
+                i++;
+            }
         }
-
-        return copy.size();
+        return i;
     }
 
     public ArrayList<Card> getFlashCards() {
@@ -250,7 +252,6 @@ public class Deck implements Writable {
         return this.currentCard;
     }
 
-    // getters & setters
     public String getTitle() { return this.title; }
     public void setTitle(String title) {
         this.title = title;

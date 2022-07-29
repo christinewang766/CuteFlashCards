@@ -16,8 +16,8 @@ public class Minimalist extends Theme {
     private JPanel buttonPanel;
 
 
-    public Minimalist(Deck deck) {
-        super(deck);
+    public Minimalist(Deck deck, CreateCards cc) {
+        super(deck, cc);
         questionFrame();
         typeAnswerHereBar();
     }
@@ -41,15 +41,27 @@ public class Minimalist extends Theme {
         flashcardPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(sageGreen, 6),
                 BorderFactory.createEmptyBorder(30,30,30,30)));
         flashcardPanel.setEditable(false);
-        flashcardPanel.setLineWrap(true);
+        flashcardPanel.setWrapStyleWord(true);
     }
 
     @Override
-    protected void setUpButtons() {
+    protected void customButtons() {
         buttonPanelBar();
         buttonHelper(skip);
         buttonPanel.add(skip, "gapright 50");
-        buttonHelper(star);
+
+        star.setFont(new Font("Calibri", Font.BOLD, 30));
+        star.setForeground(Color.white);
+        star.setBorderPainted(false);
+        star.setBackground(sageGreen);
+        ImageIcon imageIcon = new ImageIcon("src/images/star.png");
+        Image scaledImg = imageIcon.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
+        ImageIcon image = new ImageIcon("src/images/yellow star.png");
+        Image scaled = image.getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
+        star.setIcon(new ImageIcon(scaledImg));
+        star.setSelectedIcon(new ImageIcon(scaled));
+        star.setOpaque(false);
+
         buttonPanel.add(star, "gapright 50");
         buttonHelper(edit);
         buttonPanel.add(edit);

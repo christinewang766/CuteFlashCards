@@ -85,7 +85,7 @@ public class MainGUI extends JPanel {
 
 //        cards.add(titleOptionsPanel, "create warning");
 //
-//        create = new CreateCards(deck, cards);
+        create = new CreateCards(deck, cards);
 //        cards.add(create.createDeckPanel, "create deck");
 //        // effects: if user creates an empty deck and returns to menu
 //        // then user goes back to menu with no message
@@ -104,7 +104,7 @@ public class MainGUI extends JPanel {
 //        Settings settings = new Settings(deck);
 //        cards.add(settings.settingsPanel, "settings");
 
-        Minimalist minimalist = new Minimalist(deck);
+        Minimalist minimalist = new Minimalist(deck, create);
         cards.add(minimalist.mainPanel, "minimalist");
 
         Container pane = frame.getContentPane();
