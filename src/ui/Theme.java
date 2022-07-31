@@ -61,6 +61,8 @@ public abstract class Theme {
             flashcardPanel.setText(deck.getCurrentCard().getQuestion());
         } else {
             flashcardPanel.setText(deck.summary());
+            deck.resetCards();
+            cc.saveDeck(deck.getTitle());
         }
     }
 
@@ -112,9 +114,13 @@ public abstract class Theme {
 
         JButton saveEdit = new JButton("Save");
         saveEdit.addActionListener(e -> {
-            deck.getCurrentCard().setQuestion(question.getText());
-            deck.getCurrentCard().setAnswer(answer.getText());
-            flashcardPanel.setText(question.getText());
+
+            for (Card card : deck.getCards()) {
+                if (deck.getCurrentCard().getQuestion().equals(card.getQuestion())) {
+                    card.setQuestion(question.getText());
+                    card.setAnswer(answer.getText());
+                }
+            }
 
             for (Card card: updatedCards()) {
                 if (deck.getCurrentCard().getQuestion() == card.getQuestion()) {
@@ -123,6 +129,27 @@ public abstract class Theme {
                     cc.saveDeck(deck.getTitle());
                 }
             }
+
+            deck.getCurrentCard().setQuestion(question.getText());
+            deck.getCurrentCard().setAnswer(answer.getText());
+            flashcardPanel.setText(question.getText());
+
+//            for (Card c : deck.getCards()) {
+//                if (deck.getCurrentCard().getQuestion() == c.getQuestion()) {
+//                    c.setQuestion(question.getText());
+//                    c.setAnswer(answer.getText());
+//                }
+//            }
+
+//            for (Card card: updatedCards()) {
+//                if (deck.getCurrentCard().getQuestion() == card.getQuestion()) {
+//                    card.setQuestion(question.getText());
+//                    card.setAnswer(answer.getText());
+//                    cc.saveDeck(deck.getTitle());
+//                }
+//            }
+
+
 
             closeCurrentWindow();
         });
@@ -173,12 +200,14 @@ public abstract class Theme {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    setAnswer(answerField.getText());
-                    answerField.setText("");
-                    deck.submitAnswer(getAnswer());
-                    setUpFlashcardPanel();
-                    cardsLeft.setText("Cards Left: " + deck.getCountOfUnfinishedFlashcards());
-                    percentAccuracy.setText("Accuracy: " + oneDecimal.format(percentageCorrect) + "%");
+                    if (deck.getCards().size() > deck.getCompletedFlashCards().size()) {
+                        setAnswer(answerField.getText());
+                        answerField.setText("");
+                        deck.submitAnswer(getAnswer());
+                        setUpFlashcardPanel();
+                        cardsLeft.setText("Cards Left: " + deck.getCountOfUnfinishedFlashcards());
+                        percentAccuracy.setText("Accuracy: " + oneDecimal.format(percentageCorrect) + "%");
+                    }
                 }
             }
         });
@@ -187,7 +216,7 @@ public abstract class Theme {
     // effects: calculates how many cards are left to do and the
     // accuracy of the user; creates JLabel for both
     private void statistics() {
-        cardsLeft = new JLabel("Cards Left: " + deck.getUnfinishedFlashcards().size());
+        cardsLeft = new JLabel("Cards Left: " + deck.getFlashCards().size());
 
         if ((double) deck.getCompletedFlashCards().size() == 0) {
             percentAccuracy = new JLabel("Accuracy: 0%");

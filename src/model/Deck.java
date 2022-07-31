@@ -3,6 +3,7 @@ package model;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,11 +129,11 @@ public class Deck implements Writable {
     // modifies: this
     // effects: fresh batch of cards with no history
     public void resetCards() {
-        deleteAllPrevious();
+        this.flashCards.clear();
         for (Card card : this.completedFlashCards) {
             addFlashCard(card);
-            this.completedFlashCards.remove(card);
         }
+        this.completedFlashCards.clear();
         for (Card card : this.flashCards) {
             card.setComplete(false);
             card.setAttempts(NUM_ATTEMPTS);
@@ -164,14 +165,6 @@ public class Deck implements Writable {
         this.completedFlashCards.add(card);
     }
 
-    // effects: iterates through flashcards to delete all cards
-    // that have already been attempted
-    private void deleteAllPrevious() {
-        int indexBookMark = flashCards.indexOf(this.currentCard);
-        for(int i = 0; i < indexBookMark; i++) {
-            flashCards.remove(0);
-        }
-    }
 
     @Override
     // inspired by JsonSerializationDemo
@@ -184,24 +177,44 @@ public class Deck implements Writable {
     }
 
     // inspired by JsonSerializationDemo
-    // effects: returns things in this book as a JSON array
+    // effects: returns things in this deck as a JSON array
     private JSONArray deckToJson() {
         JSONArray jsonArray = new JSONArray();
 
         for (Card t : getUnfinishedFlashcards()) {
             jsonArray.put(t.toJson());
         }
-
         for (Card t : completedFlashCards) {
             jsonArray.put(t.toJson());
         }
+        ArrayList<Card> combined = new ArrayList<>();
+        combined.addAll(getUnfinishedFlashcards());
+        combined.addAll(getCompletedFlashCards());
 
-        for (Card t : this.deckCards) {
-            if (!getUnfinishedFlashcards().contains(t)
-            && !completedFlashCards.contains(t)) {
-                jsonArray.put(t.toJson());
+        ArrayList<String> combinedQuestions = new ArrayList<>();
+        ArrayList<String> deckCardQuestions = new ArrayList<>();
+        for (Card card : combined) {
+            combinedQuestions.add(card.getQuestion());
+        }
+        for (Card deckCard : getCards()) {
+            deckCardQuestions.add(deckCard.getQuestion());
+            }
+
+        for (String deckCardQuestion : deckCardQuestions) {
+            if (!combinedQuestions.contains(deckCardQuestion)) {
+                for (Card card : getCards())
+                    if (deckCardQuestion == card.getQuestion()) {
+                        jsonArray.put(card.toJson());
+                    }
             }
         }
+
+//        for (Card deckCard : this.deckCards) {
+//            if (!getUnfinishedFlashcards().contains(deckCard)
+//                    && !completedFlashCards.contains(deckCard)) {
+//                jsonArray.put(deckCard.toJson());
+//            }
+//        }
         return jsonArray;
     }
 
@@ -209,8 +222,21 @@ public class Deck implements Writable {
 
     // effects: deletes the cards marked complete from flashcards
     public ArrayList<Card> getUnfinishedFlashcards() {
-        deleteAllPrevious();
-        return this.flashCards;
+        ArrayList<Card> copy = new ArrayList<>();
+        ArrayList<Card> returnUnfinished = new ArrayList<>();
+        for (Card card : this.flashCards) {
+            copy.add(card);
+        }
+        int indexBookMark = copy.indexOf(this.currentCard);
+        for (Card card : copy) {
+            if (copy.indexOf(card) > indexBookMark) {
+                returnUnfinished.add(card);
+            }
+        }
+        if (!this.currentCard.getComplete()) {
+            returnUnfinished.add(this.currentCard);
+        }
+        return returnUnfinished;
     }
 
     public int getCountOfUnfinishedFlashcards() {
@@ -257,4 +283,7 @@ public class Deck implements Writable {
         this.title = title;
     }
 
+    public int getNextCardNum() {
+        return this.nextCard;
+    }
 }

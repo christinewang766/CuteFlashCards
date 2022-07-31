@@ -40,6 +40,7 @@ public class MainGUI extends JPanel {
         try {
             JsonReader jsonReader = new JsonReader("./data/howdy.json");
             deck = jsonReader.read();
+            deck.setCards(jsonReader.read().getFlashCards());
             System.out.println("Loaded " + deck.getTitle() + " from ./data/howdy.json");
         } catch (IOException e) {
             System.out.println("Unable to read from file: ./data/howdy.json");
