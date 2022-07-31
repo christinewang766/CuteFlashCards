@@ -60,6 +60,8 @@ public abstract class Theme {
             deck.getNextCard();
             if (!deck.getCurrentCard().getStarred()) {
                 star.setSelected(false);
+            } else {
+                star.setSelected(true);
             }
             flashcardPanel.setText(deck.getCurrentCard().getQuestion());
         } else {

@@ -17,6 +17,8 @@ public class Settings {
 
     private Deck deck;
     private CreateCards cc;
+    private JPanel cards;
+    private CardLayout cl;
     protected JPanel optionsContainer;
     protected JPanel settingsPanel;
 
@@ -31,9 +33,11 @@ public class Settings {
     private final Color veryLightPink = new Color(255, 242, 242);
     private final Font smallCalibri = new Font("Calibri", Font.BOLD, 20);
 
-    public Settings(Deck deck, CreateCards cc) {
+    public Settings(Deck deck, CreateCards cc, JPanel cards) {
         this.deck = deck;
         this.cc = cc;
+        this.cards = cards;
+        cl = (CardLayout) (cards.getLayout());
         optionsPanel();
         createButtons();
         createLayout();
@@ -102,13 +106,15 @@ public class Settings {
                 deck.setFlashCards(deck.starredOnly());
             }
             if (minimalist.isSelected()) {
-                Minimalist min = new Minimalist(deck, cc);
+                Minimalist minimalist = new Minimalist(deck, cc);
+                cards.add(minimalist.mainPanel, "minimalist");
+                cl.show(cards, "minimalist");
                 System.out.println("minimalist");
             } if (cutesy.isSelected()) {
-                Minimalist min = new Minimalist(deck, cc);
+                cl.show(cards, "minimalist");
                 System.out.println("cutesey");
             } if (edgy.isSelected()) {
-                Minimalist min = new Minimalist(deck, cc);
+                cl.show(cards, "minimalist");
                 System.out.println("edgy");
             }
         });

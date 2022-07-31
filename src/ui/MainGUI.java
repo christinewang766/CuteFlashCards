@@ -36,15 +36,15 @@ public class MainGUI extends JPanel {
 
     public MainGUI() {
         deck = new Deck(ENTER_TITLE);
-        // TODO delete after!!!
-        try {
-            JsonReader jsonReader = new JsonReader("./data/howdy.json");
-            deck = jsonReader.read();
-            deck.setCards(jsonReader.read().getFlashCards());
-            System.out.println("Loaded " + deck.getTitle() + " from ./data/howdy.json");
-        } catch (IOException e) {
-            System.out.println("Unable to read from file: ./data/howdy.json");
-        }
+//        // TODO delete after!!!
+//        try {
+//            JsonReader jsonReader = new JsonReader("./data/howdy.json");
+//            deck = jsonReader.read();
+//            deck.setCards(jsonReader.read().getFlashCards());
+//            System.out.println("Loaded " + deck.getTitle() + " from ./data/howdy.json");
+//        } catch (IOException e) {
+//            System.out.println("Unable to read from file: ./data/howdy.json");
+//        }
         makeFrame();
         layers();
         frame.pack();
@@ -82,31 +82,25 @@ public class MainGUI extends JPanel {
         cards = new JPanel(new CardLayout());
         cl = (CardLayout) (cards.getLayout());
         // TODO uncomment displayTitleOptions()
-//        displayTitleOptions();
+        displayTitleOptions();
 
-//        cards.add(titleOptionsPanel, "create warning");
-//
+        cards.add(titleOptionsPanel, "create warning");
+
         create = new CreateCards(deck, cards);
-//        cards.add(create.createDeckPanel, "create deck");
-//        // effects: if user creates an empty deck and returns to menu
-//        // then user goes back to menu with no message
-//        backToMenu(false, create.getMenuButton());
-//        // effects: if user creates a deck and refuses to save then
-//        // user is taken back to menu and deck in progress vanishes
-//        backToMenu(true, create.getNopeButton());
-//
-//        load = new LoadDeck();
-//        cards.add(load.loadDeckPanel, "loading");
-//        loadActions();
-//
-//        find = new FindFile(deck, create, cards);
-//        cards.add(find.findFilePanel, "find file panel");
-//
-//        Settings settings = new Settings(deck);
-//        cards.add(settings.settingsPanel, "settings");
+        cards.add(create.createDeckPanel, "create deck");
+        // effects: if user creates an empty deck and returns to menu
+        // then user goes back to menu with no message
+        backToMenu(false, create.getMenuButton());
+        // effects: if user creates a deck and refuses to save then
+        // user is taken back to menu and deck in progress vanishes
+        backToMenu(true, create.getNopeButton());
 
-        Minimalist minimalist = new Minimalist(deck, create);
-        cards.add(minimalist.mainPanel, "minimalist");
+        load = new LoadDeck();
+        cards.add(load.loadDeckPanel, "loading");
+        loadActions();
+
+        find = new FindFile(deck, create, cards);
+        cards.add(find.findFilePanel, "find file panel");
 
         Container pane = frame.getContentPane();
         pane.add(cards, BorderLayout.CENTER);
@@ -163,9 +157,9 @@ public class MainGUI extends JPanel {
         loaded.addActionListener(e -> {
             cl.show(cards, "create deck");
             create.title.setText(find.getTitle());
+            create.setDeck(find.getFindDeck());
             create.displayCreatedCards(find.getFindDeck().getFlashCards());
             create.title.requestFocus();
-            create.setDeck(find.getFindDeck());
         });
     }
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static jdk.internal.dynalink.support.Guards.isNull;
 import static model.Card.NUM_ATTEMPTS;
 
 public class Deck implements Writable {
@@ -134,7 +135,9 @@ public class Deck implements Writable {
         }
         this.completedFlashCards.clear();
         this.nextCard = 0;
-        this.currentCard = this.flashCards.get(0);
+        if (!this.flashCards.isEmpty()) {
+            this.currentCard = this.flashCards.get(0);
+        }
         for (Card card : this.flashCards) {
             card.setComplete(false);
             card.setAttempts(NUM_ATTEMPTS);
@@ -234,7 +237,7 @@ public class Deck implements Writable {
                 returnUnfinished.add(card);
             }
         }
-        if (!this.currentCard.getComplete()) {
+        if ((this.currentCard != null) && !this.currentCard.getComplete()) {
             returnUnfinished.add(this.currentCard);
         }
         return returnUnfinished;

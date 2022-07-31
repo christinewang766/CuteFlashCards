@@ -15,7 +15,6 @@ public class Minimalist extends Theme {
     public final static Color sageGreen = new Color(180,192,173,255);
     private JPanel buttonPanel;
 
-
     public Minimalist(Deck deck, CreateCards cc) {
         super(deck, cc);
         questionFrame();

@@ -73,7 +73,11 @@ public class EditPanel {
         starButton = new JButton("Star");
         cardButtonHelper(starButton, "src/images/star.png");
         starButton.addActionListener(e -> {
-            deck.getFlashCards().get(index).setStarred(true);
+            if (deck.getFlashCards().get(index).getStarred()) {
+                deck.getFlashCards().get(index).setStarred(false);
+            } else {
+                deck.getFlashCards().get(index).setStarred(true);
+            }
         });
 
         questionCardArea.addFocusListener(new FListen(questionCardArea));
@@ -148,7 +152,9 @@ public class EditPanel {
                             110, 110);
                     questionCardArea.requestFocus();
                 } else {
+                    // NOT WORKING WHEN LOADING DECK IN -- works fine when creating deck
                     deck.getFlashCards().get(index).setQuestion(questionCardArea.getText());
+                    deck.getCards().get(index).setQuestion(questionCardArea.getText());
                 }
             } if (textArea == answerCardArea) {
                 if (answerCardArea.getText().length() > CHAR_LIMIT) {
@@ -160,6 +166,7 @@ public class EditPanel {
                     answerCardArea.requestFocus();
                 } else {
                     deck.getFlashCards().get(index).setAnswer(answerCardArea.getText());
+                    deck.getCards().get(index).setAnswer(answerCardArea.getText());
                 }
             }
             textArea.setBorder(new EmptyBorder(10, 10, 10, 10));

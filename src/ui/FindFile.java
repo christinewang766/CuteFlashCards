@@ -166,6 +166,7 @@ public class FindFile {
         try {
             JsonReader jsonReader = new JsonReader(getSource());
             deck = jsonReader.read();
+            deck.setCards(jsonReader.read().getFlashCards());
             System.out.println("Loaded " + deck.getTitle() + " from " + getSource());
             return true;
         } catch (IOException e) {

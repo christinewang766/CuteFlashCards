@@ -212,6 +212,8 @@ public class CreateCards {
         // TODO
         startButton.addActionListener(e -> {
             saveCheck(false);
+            Settings settings = new Settings(deck, this, cards);
+            cards.add(settings.settingsPanel, "settings");
             cl.show(cards, "settings");
         });
         createCardsButtonHelper(startButton);
@@ -423,6 +425,7 @@ public class CreateCards {
         return this.answerArea;
     }
 
+
     private class CuteFocusListener implements FocusListener {
 
         @Override
@@ -460,5 +463,13 @@ public class CreateCards {
 
     public void setDeck(Deck deck) {
         this.deck = deck;
+    }
+
+    public JButton getMenuButton() {
+        return this.menuButton;
+    }
+
+    public JButton getNopeButton() {
+        return this.nope;
     }
 }
