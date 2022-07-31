@@ -3,7 +3,6 @@ package model;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,6 +133,8 @@ public class Deck implements Writable {
             addFlashCard(card);
         }
         this.completedFlashCards.clear();
+        this.nextCard = 0;
+        this.currentCard = this.flashCards.get(0);
         for (Card card : this.flashCards) {
             card.setComplete(false);
             card.setAttempts(NUM_ATTEMPTS);

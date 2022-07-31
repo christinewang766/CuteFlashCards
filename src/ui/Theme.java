@@ -58,6 +58,9 @@ public abstract class Theme {
     protected void setUpFlashcardPanel() {
         if (deck.hasMoreCards()) {
             deck.getNextCard();
+            if (!deck.getCurrentCard().getStarred()) {
+                star.setSelected(false);
+            }
             flashcardPanel.setText(deck.getCurrentCard().getQuestion());
         } else {
             flashcardPanel.setText(deck.summary());
@@ -133,23 +136,6 @@ public abstract class Theme {
             deck.getCurrentCard().setQuestion(question.getText());
             deck.getCurrentCard().setAnswer(answer.getText());
             flashcardPanel.setText(question.getText());
-
-//            for (Card c : deck.getCards()) {
-//                if (deck.getCurrentCard().getQuestion() == c.getQuestion()) {
-//                    c.setQuestion(question.getText());
-//                    c.setAnswer(answer.getText());
-//                }
-//            }
-
-//            for (Card card: updatedCards()) {
-//                if (deck.getCurrentCard().getQuestion() == card.getQuestion()) {
-//                    card.setQuestion(question.getText());
-//                    card.setAnswer(answer.getText());
-//                    cc.saveDeck(deck.getTitle());
-//                }
-//            }
-
-
 
             closeCurrentWindow();
         });
