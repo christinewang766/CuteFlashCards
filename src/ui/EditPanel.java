@@ -71,12 +71,20 @@ public class EditPanel {
 
     private void createButtons() {
         starButton = new JButton("Star");
-        cardButtonHelper(starButton, "src/images/star.png");
+        if (deck.getFlashCards().get(index).getStarred()) {
+            cardButtonHelper(starButton, "src/images/yellow star.png");
+        } else {
+            cardButtonHelper(starButton, "src/images/star.png");
+        }
         starButton.addActionListener(e -> {
             if (deck.getFlashCards().get(index).getStarred()) {
                 deck.getFlashCards().get(index).setStarred(false);
+                deck.getCards().get(index).setStarred(false);
+                cardButtonHelper(starButton, "src/images/star.png");
             } else {
                 deck.getFlashCards().get(index).setStarred(true);
+                deck.getCards().get(index).setStarred(true);
+                cardButtonHelper(starButton, "src/images/yellow star.png");
             }
         });
 
@@ -87,6 +95,7 @@ public class EditPanel {
         cardButtonHelper(deleteButton, "src/images/delete.png");
         deleteButton.addActionListener(e -> {
             deck.getFlashCards().remove(this.index);
+            deck.getCards().remove(this.index);
             cc.displayCreatedCards(deck.getFlashCards());
         });
     }

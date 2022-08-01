@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
+import static ui.HelperMethods.createNoButtonJOption;
 import static ui.HelperMethods.makeJOptionButtons;
 import static ui.MainGUI.*;
 import static ui.MainGUI.BRIGHT_TURNIPS;
@@ -111,9 +112,19 @@ public class Settings {
                 cl.show(cards, "minimalist");
                 System.out.println("minimalist");
             } if (cutesy.isSelected()) {
+                Minimalist minimalist = new Minimalist(deck, cc);
+                createNoButtonJOption(minimalist.getMainPanel(), "Sorry, the 'cutesy' theme is\na work in " +
+                        "progress!\nHere's the 'minimalist' theme instead!",
+                        "Dwayboochi", "src/images/sorry.png",120,120);
+                cards.add(minimalist.mainPanel, "minimalist");
                 cl.show(cards, "minimalist");
                 System.out.println("cutesey");
             } if (edgy.isSelected()) {
+                Minimalist minimalist = new Minimalist(deck, cc);
+                createNoButtonJOption(minimalist.getMainPanel(), "Sorry, the 'edgy' theme is\na work in " +
+                                "progress!\nHere's the 'minimalist' theme instead!",
+                        "Dwayboochi", "src/images/sorry.png",120,120);
+                cards.add(minimalist.mainPanel, "minimalist");
                 cl.show(cards, "minimalist");
                 System.out.println("edgy");
             }
@@ -139,7 +150,7 @@ public class Settings {
         optionsContainer.setBorder(new CompoundBorder(
                 BorderFactory.createMatteBorder(30, 30, 30, 30, BRIGHT_PINK),
                 new EmptyBorder(30, 30, 30, 30)));
-        JLabel theme = new JLabel("temp");
+        JLabel theme = new JLabel("Theme");
         theme.setFont(CONSOLAS);
         theme.setForeground(BRIGHT_PINK);
 

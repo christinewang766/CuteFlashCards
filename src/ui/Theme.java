@@ -37,6 +37,7 @@ public abstract class Theme {
 
     private DecimalFormat oneDecimal;
     private double percentageCorrect;
+    private String finalStats;
 
     protected Deck deck;
     protected CreateCards cc;
@@ -66,14 +67,20 @@ public abstract class Theme {
             flashcardPanel.setText(deck.getCurrentCard().getQuestion());
         } else {
             flashcardPanel.setText(deck.summary());
+            finalStats = deck.summary();
             deck.resetCards();
             cc.saveDeck(deck.getTitle());
+            answerField.setText("Congrats on finishing the set!");
+            cardsLeft.setText("Cards: 0");
+            answerField.setEditable(false);
+            congratulations();
         }
     }
 
     private void init() {
         question = "question";
         answer = "answer";
+        finalStats = "nothing";
         flashcardPanel = new JTextArea();
         skip = new JButton("Skip >>");
         star = new JCheckBox(" Star", false);
@@ -228,6 +235,21 @@ public abstract class Theme {
                 }
             }
         });
+    }
+
+    private void congratulations() {
+        JButton restart = new JButton("Restart");
+        JButton no = new JButton("No");
+        JButton[] buttons = {restart, no};
+        makeJOptionButtons(restart);
+        makeJOptionButtons(no);
+
+        JOptionPane.showOptionDialog(mainPanel, "You're a rockstar!\nStats of this session are as follows:\n" +
+                        finalStats + "\nBe proud of yourself for sticking it out to the end.\n\n" +
+                        "Would you like to keep studying?","Woohoo!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                createSmallIcon("src/images/party.png", 200, 200),
+                buttons, buttons[0]);
     }
 
     abstract void customFlashcardPanel();

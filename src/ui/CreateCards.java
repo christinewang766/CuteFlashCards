@@ -166,10 +166,40 @@ public class CreateCards {
 
     // effects: checks if the deck/title satisfies saving criteria
     private void saveCheck(Boolean closeWindow) {
+        final Boolean[] overwritten = new Boolean[1];
+        overwritten[0] = false;
+        final Boolean[] rejected = new Boolean[1];
+        rejected[0] = false;
+
         if (deck.getFlashCards().isEmpty()) {
             createNoButtonJOption(createDeckPanel, "There's no cards to save!",
                     "Not to be mean...but...", "src/images/save.png", 100, 100);
-        } else if (userTitle.isEmpty() ||
+        } else {
+            JButton sure = new JButton("Sure");
+            JButton no = new JButton("No");
+            JButton[] buttons = {sure, no};
+            makeJOptionButtons(sure);
+            sure.addActionListener(e -> {
+                saveDeck(userTitle);
+                closeCurrentWindow();
+                overwritten[0] = true;
+            });
+            makeJOptionButtons(no);
+            no.addActionListener(e -> {
+                closeCurrentWindow();
+                rejected[0] = true;
+            });
+
+            File f = new File("data");
+            FilenameFilter filter = (f1, name) -> name.equals(userTitle + ".json");
+            if (Objects.requireNonNull(f.list(filter)).length > 0) {
+                JOptionPane.showOptionDialog(createDeckPanel, "Save and overwrite a file?",
+                        "Menu Warning",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        createSmallIcon("src/images/save.png", 100, 100),
+                        buttons, buttons[0]);
+            }
+        } if (userTitle.isEmpty() ||
                 userTitle == ENTER_TITLE) {
             createNoButtonJOption(createDeckPanel, "Please choose a new title!",
                     "Not to be mean...but...", "src/images/knife.png", 110, 110);
@@ -177,7 +207,7 @@ public class CreateCards {
             createNoButtonJOption(createDeckPanel, "Please make sure that the title only\n"
                             + "contains letters and numbers.", "Listen, Buddy...", "src/images/knife.png",
                     110, 110);
-        } else {
+        } else if (!overwritten[0] && !rejected[0]) {
             saveDeck(userTitle);
             if (closeWindow) {
                 closeCurrentWindow();

@@ -106,4 +106,8 @@ public class Minimalist extends Theme {
         mainPanel.add(answerField, "south");
     }
 
+    public JPanel getMainPanel() {
+        return this.mainPanel;
+    }
+
 }
